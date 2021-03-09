@@ -8,19 +8,37 @@
  * it applies also to any other work released this way by its authors. You can apply it to your programs, too.
  */
 
-/// @file main.cc
+/// @file json_parser.h
 
-#include "utils/json_parser.h"
-#include "window_manager/window_manager.h"
+#include "json_parser.h"
 
-window_manager::Window* window_manager::Window::_instance = nullptr;
+#include <cstdio>
 
-int main() {
-    auto win_doc = utils::JsonParser::parseDocument("./configurations/window.json");
-    auto win = window_manager::Window::getInstance(win_doc["width"].GetInt(), win_doc["height"].GetInt());
+namespace utils {
 
-    win->render();
-
-    window_manager::Window::destroyInstance();
-    return 0;
+rapidjson::Document JsonParser::parseDocument(const std::string& filename) {
+    rapidjson::Document doc;
+    std::string content = JsonParser::readAll(filename);
+    doc.Parse(content.c_str());
+    return doc;
 }
+
+std::string JsonParser::readAll(const std::string& filename) {
+    FILE* fp = fopen(filename.c_str(), "r");
+    if (fp == nullptr) {
+        return "";
+    }
+
+    std::string content;
+    while (!feof(fp)) {
+        char c = fgetc(fp);
+        if (c != EOF) {
+            content += c;
+        }
+    }
+
+    fclose(fp);
+    return content;
+}
+
+} // namespace utils

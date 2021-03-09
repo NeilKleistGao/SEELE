@@ -8,19 +8,17 @@
  * it applies also to any other work released this way by its authors. You can apply it to your programs, too.
  */
 
-/// @file main.cc
+/// @file debug.h
 
-#include "utils/json_parser.h"
-#include "window_manager/window_manager.h"
+#include "debug.h"
 
-window_manager::Window* window_manager::Window::_instance = nullptr;
+#include <iostream>
 
-int main() {
-    auto win_doc = utils::JsonParser::parseDocument("./configurations/window.json");
-    auto win = window_manager::Window::getInstance(win_doc["width"].GetInt(), win_doc["height"].GetInt());
+namespace utils {
 
-    win->render();
-
-    window_manager::Window::destroyInstance();
-    return 0;
+void Debug::terminate(const std::string& content, const int& error) {
+    std::cerr << content << std::endl;
+    exit(error);
 }
+
+} // namespace utils
