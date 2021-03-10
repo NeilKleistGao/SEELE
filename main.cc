@@ -13,11 +13,11 @@
 #include "utils/json_parser.h"
 #include "window_manager/window_manager.h"
 
-window_manager::Window* window_manager::Window::_instance = nullptr;
+const static std::string TITLE = "Software-rendering ExtendiblE Laboratorial Engine";
 
 int main() {
     auto win_doc = utils::JsonParser::parseDocument("./configurations/window.json");
-    auto win = window_manager::Window::getInstance(win_doc["width"].GetInt(), win_doc["height"].GetInt());
+    auto win = window_manager::Window::getInstance(win_doc["width"].GetInt(), win_doc["height"].GetInt(), TITLE);
 
     win->render();
 

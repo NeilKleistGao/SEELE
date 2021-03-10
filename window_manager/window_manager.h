@@ -19,4 +19,8 @@
 #error "THIS PLATFORM IS NOT SUPPORTED!"
 #endif
 
+namespace window_manager {
+window_manager::Window* window_manager::Window::_instance = nullptr;
+} // namespace window_manager
+
 #endif //SEELE_WINDOW_MANAGER_H
