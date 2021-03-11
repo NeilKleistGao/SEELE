@@ -8,20 +8,14 @@
  * it applies also to any other work released this way by its authors. You can apply it to your programs, too.
  */
 
-/// @file main.cc
+/// @file mac_os.h
 
-#include "utils/json_parser.h"
-#include "window_manager/window_manager.h"
+#ifndef SEELE_MAC_OS_H
+#define SEELE_MAC_OS_H
 
-const static std::string TITLE = "Software-rendering ExtendiblE Laboratorial Engine";
+#include <iostream>
+#include <chrono>
 
-int main() {
-    auto win_doc = utils::JsonParser::parseDocument("./configurations/window.json");
-    auto win = window_manager::Window::getInstance(win_doc["width"].GetInt(), win_doc["height"].GetInt(), TITLE);
+#include "utils/debug.h"
 
-    win->setDrawFunction(+[](){});
-    win->render();
-
-    window_manager::Window::destroyInstance();
-    return 0;
-}
+#endif //SEELE_MAC_OS_H

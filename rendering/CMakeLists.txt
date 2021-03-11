@@ -1,4 +1,6 @@
 set(RENDERING_PATH_PREFIX rendering)
 
-set(RENDERING_HEADERS )
-set(RENDERING_SRCS )
+set(RENDERING_HEADERS
+        ${RENDERING_PATH_PREFIX}/renderer.h)
+set(RENDERING_SRCS
+        ${RENDERING_PATH_PREFIX}/renderer.cc)

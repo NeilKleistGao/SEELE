@@ -8,20 +8,18 @@
  * it applies also to any other work released this way by its authors. You can apply it to your programs, too.
  */
 
-/// @file main.cc
+/// @file renderer.h
 
-#include "utils/json_parser.h"
-#include "window_manager/window_manager.h"
+#ifndef SEELE_RENDERER_H
+#define SEELE_RENDERER_H
 
-const static std::string TITLE = "Software-rendering ExtendiblE Laboratorial Engine";
+namespace rendering {
 
-int main() {
-    auto win_doc = utils::JsonParser::parseDocument("./configurations/window.json");
-    auto win = window_manager::Window::getInstance(win_doc["width"].GetInt(), win_doc["height"].GetInt(), TITLE);
+class Renderer {
+public:
+private:
+};
 
-    win->setDrawFunction(+[](){});
-    win->render();
+} // namespace rendering
 
-    window_manager::Window::destroyInstance();
-    return 0;
-}
+#endif //SEELE_RENDERER_H

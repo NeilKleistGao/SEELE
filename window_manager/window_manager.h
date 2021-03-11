@@ -15,6 +15,10 @@
 
 #ifdef PLATFORM_LINUX
 #include "linux.h"
+#elif PLATFORM_WINDOWS
+#include "windows.h"
+#elif PLATFORM_MACOS
+#include "mac_os.h"
 #else
 #error "THIS PLATFORM IS NOT SUPPORTED!"
 #endif

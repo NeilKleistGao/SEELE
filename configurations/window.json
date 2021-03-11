@@ -1,17 +1,4 @@
 {
   "width": 1024,
-  "height": 768,
-  "mouse-action": {
-    "move": "moving2",
-    "rotate": "moving0",
-    "scale": "rolling2"
-  },
-  "hot-key": {
-    "shift": [
-      {
-        "name": "export",
-        "key": "e"
-      }
-    ]
-  }
+  "height": 768
 }
