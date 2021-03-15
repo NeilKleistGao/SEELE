@@ -11,3 +11,39 @@
 /// @file renderer.cc
 
 #include "renderer.h"
+
+#include "window_manager/window_manager.h"
+
+namespace rendering {
+Renderer* Renderer::_instance = nullptr;
+
+Renderer* Renderer::getInstance() {
+    if (_instance == nullptr) {
+        _instance = new(std::nothrow) Renderer();
+        if (_instance == nullptr) {
+            Debug::terminate("can't create renderer instance.");
+        }
+    }
+
+    return _instance;
+}
+
+void Renderer::destroyInstance() {
+    if (_instance != nullptr) {
+        delete _instance;
+        _instance = nullptr;
+    }
+}
+
+void Renderer::clearWithColor(const unsigned char& r, const unsigned char& g, const unsigned char& b) {
+    auto window = window_manager::Window::getInstance();
+    auto size = window->_width * window->_height;
+    for (int i = 0; i < size; i++) {
+        window->_buffer2[i * 4] = r;
+        window->_buffer2[i * 4 + 1] = g;
+        window->_buffer2[i * 4 + 2] = b;
+        window->_buffer2[i * 4 + 3] = 255;
+    }
+}
+
+} // namespace rendering

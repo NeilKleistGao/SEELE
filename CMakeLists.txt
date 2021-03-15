@@ -8,7 +8,7 @@ include_directories(include)
 
 add_definitions(-D PLATFORM_LINUX)
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O2")
+# set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O2")
 set(PLATFORM_PREFIX "/lib/linux")
 set(EXECUTABLE_OUTPUT_PATH "${CMAKE_SOURCE_DIR}/bin")
 

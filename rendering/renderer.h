@@ -13,11 +13,24 @@
 #ifndef SEELE_RENDERER_H
 #define SEELE_RENDERER_H
 
+#include "utils/debug.h"
+#include "utils/registration.h"
+
 namespace rendering {
 
 class Renderer {
 public:
+    static Renderer* getInstance();
+    static void destroyInstance();
+
+    void clearWithColor(const unsigned char& r, const unsigned char& g, const unsigned char& b);
 private:
+    using Debug = utils::Debug;
+
+    Renderer() = default;
+    ~Renderer() = default;
+
+    static Renderer* _instance;
 };
 
 } // namespace rendering

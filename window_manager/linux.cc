@@ -43,7 +43,7 @@ void Window::render() {
 
     while (!_closing) {
         _draw_func();
-        draw();
+        display();
 
         time_type now = std::chrono::system_clock::now();
         float duration = (now - _timer).count();
@@ -56,7 +56,8 @@ void Window::render() {
     }
 }
 
-Window::Window(const size_t& width, const size_t& height, const std::string& title) : _buffer(nullptr), _closing(false), _width(width), _height(height) {
+Window::Window(const size_t& width, const size_t& height, const std::string& title)
+    : _buffer1(nullptr), _buffer2(nullptr), _closing(false), _width(width), _height(height) {
     openDisplay();
     _screen = XDefaultScreen(_display);
     createWindow(title);
@@ -76,8 +77,10 @@ Window::~Window() {
     XDestroyWindow(_display, _handle);
     XFlush(_display);
 
-    delete _buffer;
-    _buffer = nullptr;
+    delete _buffer1;
+    _buffer1 = nullptr;
+    delete _buffer2;
+    _buffer2 = nullptr;
 }
 
 void Window::openDisplay() {
@@ -126,11 +129,13 @@ void Window::createImage() {
     auto visual = XDefaultVisual(_display, _screen);
 
     auto buffer_size = sizeof(unsigned char) * _width * _height * 4;
-    _buffer = static_cast<unsigned char*>(::operator new(buffer_size));
-    std::memset(_buffer, 0, buffer_size);
+    _buffer1 = static_cast<unsigned char*>(::operator new(buffer_size));
+    _buffer2 = static_cast<unsigned char*>(::operator new(buffer_size));
+    std::memset(_buffer1, 0, buffer_size);
+    std::memset(_buffer2, 0, buffer_size);
 
     _image = XCreateImage(_display, visual, depth, ZPixmap, 0,
-                          reinterpret_cast<char*>(_buffer), _width, _height, 32, 0);
+                          reinterpret_cast<char*>(_buffer1), _width, _height, 32, 0);
 }
 
 void Window::pollEvent() {
@@ -164,9 +169,21 @@ void Window::processClientMessage(const XClientMessageEvent& event) {
     }
 }
 
-void Window::draw() {
-    // TODO:
+void Window::display() {
     GC gc = XDefaultGC(_display, _screen);
+    for (int i = 0; i < _height; i++) {
+        for (int j = 0; j < _width; j++) {
+            auto id1 = (_height - i - 1) * _width + j;
+            auto id2 = i * _width + j;
+
+            _buffer1[id1 * 4] = _buffer2[id2 * 4 + 2];
+            _buffer1[id1 * 4 + 1] = _buffer2[id2 * 4 + 1];
+            _buffer1[id1 * 4 + 2] = _buffer2[id2 * 4];
+        }
+    }
+
+    XPutImage(_display, _handle, gc, _image, 0, 0, 0, 0, _width, _height);
+    XFlush(_display);
 }
 
 } // namespace window_manager

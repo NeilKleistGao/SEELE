@@ -8,28 +8,24 @@
  * it applies also to any other work released this way by its authors. You can apply it to your programs, too.
  */
 
-/// @file main.cc
+/// @file linux.h
 
-#include "utils/json_parser.h"
-#include "window_manager/window_manager.h"
-#include "rendering/renderer.h"
+#ifndef SEELE_REGISTRATION_H
+#define SEELE_REGISTRATION_H
 
-const static std::string TITLE = "Software-rendering ExtendiblE Laboratorial Engine";
+#define __SEELE_CAT(__X__, __Y__) __X__##__Y__
+#define SEELE_CAT(__X__, __Y__) __SEELE_CAT(__X__, __Y__)
 
-namespace window_manager {
-window_manager::Window* window_manager::Window::_instance = nullptr;
-} // namespace window_manager
+#define SEELE_REGISTRATION(__NAME__) \
+static void SEELE_CAT(__REGISTER_, __NAME__) (); \
+namespace {                          \
+struct SEELE_CAT(__NAME__, __REGISTTRATION_) {     \
+    SEELE_CAT(__NAME__, __REGISTTRATION_) () { \
+          SEELE_CAT(__REGISTER_, __NAME__) ();                       \
+    }                               \
+};                               \
+}                                    \
+static const SEELE_CAT(__NAME__, __REGISTTRATION_) SEELE_CAT(__NAME__, __registration); \
+static void SEELE_CAT(__REGISTER_, __NAME__) ()
 
-int main(int argc, char* argv[]) {
-    auto win_doc = utils::JsonParser::parseDocument("./configurations/window.json");
-    auto win = window_manager::Window::getInstance(win_doc["width"].GetInt(), win_doc["height"].GetInt(), TITLE);
-
-    win->setDrawFunction([](){
-        auto renderer = rendering::Renderer::getInstance();
-        renderer->clearWithColor(0x66, 0xcc, 0xff);
-    });
-    win->render();
-
-    window_manager::Window::destroyInstance();
-    return 0;
-}
+#endif //SEELE_REGISTRATION_H

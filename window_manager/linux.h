@@ -57,7 +57,7 @@ private:
     Atom _protocols;
     Atom _delete_ptc;
 
-    unsigned char* _buffer;
+    unsigned char* _buffer1, *_buffer2;
 
     bool _closing;
 
@@ -83,7 +83,7 @@ private:
 
     void processClientMessage(const XClientMessageEvent& event);
 
-    void draw();
+    void display();
 };
 
 } // namespace window_manager
