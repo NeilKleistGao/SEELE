@@ -42,15 +42,16 @@ void Window::render() {
     _timer = std::chrono::system_clock::now();
 
     while (!_closing) {
-        _draw_func();
-        display();
-
         time_type now = std::chrono::system_clock::now();
         float duration = (now - _timer).count();
         if (duration <= 0.001) {
             using namespace std::chrono_literals;
-            std::this_thread::sleep_for(30ms);
+            std::this_thread::sleep_for(33ms);
+            duration = 0.033;
         }
+
+        _draw_func(duration);
+        display();
 
         pollEvent();
     }

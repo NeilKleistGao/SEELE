@@ -10,9 +10,13 @@
 
 /// @file main.cc
 
+#include <filesystem>
+
 #include "utils/json_parser.h"
-#include "window_manager/window_manager.h"
 #include "rendering/renderer.h"
+#include "script/rendering_script.h"
+#include "window_manager/window_manager.h"
+#include "utils/debug.h"
 
 const static std::string TITLE = "Software-rendering ExtendiblE Laboratorial Engine";
 
@@ -21,15 +25,28 @@ window_manager::Window* window_manager::Window::_instance = nullptr;
 } // namespace window_manager
 
 int main(int argc, char* argv[]) {
-    auto win_doc = utils::JsonParser::parseDocument("./configurations/window.json");
+    if (argc < 2) {
+        utils::Debug::terminate("please specify the experiment path.");
+    }
+
+    auto base = std::filesystem::path{std::string{argv[1]}};
+    auto win_doc = utils::JsonParser::parseDocument(std::filesystem::path{base} /= "window.json");
     auto win = window_manager::Window::getInstance(win_doc["width"].GetInt(), win_doc["height"].GetInt(), TITLE);
 
-    win->setDrawFunction([](){
-        auto renderer = rendering::Renderer::getInstance();
-        renderer->clearWithColor(0x66, 0xcc, 0xff);
+    auto rs = script::RenderingScript::getInstance();
+    base = std::filesystem::path{std::string{argv[1]}};
+    rs->preload(base /= "api");
+    base = std::filesystem::path{std::string{argv[1]}};
+    rs->load(base /= win_doc["rendering-script"].GetString());
+
+    win->setDrawFunction(+[](const float& delta){
+        auto rs = script::RenderingScript::getInstance();
+        rs->update(delta);
     });
     win->render();
 
+    script::RenderingScript::destroyInstance();
     window_manager::Window::destroyInstance();
+
     return 0;
 }

@@ -8,45 +8,42 @@
  * it applies also to any other work released this way by its authors. You can apply it to your programs, too.
  */
 
-/// @file renderer.h
+/// @file rendering_script.h
 
-#ifndef SEELE_RENDERER_H
-#define SEELE_RENDERER_H
+#ifndef SEELE_RENDERING_SCRIPT_H
+#define SEELE_RENDERING_SCRIPT_H
+
+#include <filesystem>
 
 #include "lua/lua.hpp"
 #include "LuaBridge/LuaBridge.h"
 
 #include "utils/debug.h"
-#include "utils/registration.h"
-#include "script/rendering_script.h"
 
-namespace rendering {
+namespace script {
 
-class Renderer {
+class RenderingScript {
 public:
-    static Renderer* getInstance();
+    static RenderingScript* getInstance();
     static void destroyInstance();
 
-    void clearWithColor(const unsigned char& r, const unsigned char& g, const unsigned char& b);
+    void preload(const std::filesystem::path& path);
+    void load(const std::string& filename);
+    void update(const float& delta);
+
+    inline lua_State* getState() {
+        return _state;
+    }
 private:
     using Debug = utils::Debug;
 
-    Renderer() = default;
-    ~Renderer() = default;
+    RenderingScript();
+    ~RenderingScript();
 
-    static Renderer* _instance;
+    static RenderingScript* _instance;
+    lua_State* _state;
 };
 
-SEELE_REGISTRATION(Renderer) {
-    luabridge::getGlobalNamespace(script::RenderingScript::getInstance()->getState())
-        .beginNamespace("seele")
-            .beginClass<Renderer>("Renderer")
-                .addStaticFunction("getInstance", &Renderer::getInstance)
-                .addFunction("clearWithColor", &Renderer::clearWithColor)
-            .endClass()
-        .endNamespace();
-}
+} // namespace script
 
-} // namespace rendering
-
-#endif //SEELE_RENDERER_H
+#endif //SEELE_RENDERING_SCRIPT_H

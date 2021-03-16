@@ -23,7 +23,10 @@
 #include <X11/Xutil.h>
 
 #include "utils/debug.h"
-#include "rendering/renderer.h"
+
+namespace rendering {
+class Renderer;
+} // namespace rendering
 
 namespace window_manager {
 class Window {
@@ -38,7 +41,7 @@ public:
 
     void render();
 
-    inline void setDrawFunction(std::function<void(void)> func) {
+    inline void setDrawFunction(std::function<void(const float&)> func) {
         _draw_func = std::move(func);
     }
 
@@ -65,7 +68,7 @@ private:
 
     time_type _timer;
 
-    std::function<void(void)> _draw_func;
+    std::function<void(const float&)> _draw_func;
 
     Window(const size_t& width, const size_t& height, const std::string& title);
 
