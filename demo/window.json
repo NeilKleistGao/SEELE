@@ -1,5 +1,5 @@
 {
   "width": 1024,
   "height": 768,
-  "rendering-script": "hello_world.lua"
+  "rendering-script": "wireframe.lua"
 }

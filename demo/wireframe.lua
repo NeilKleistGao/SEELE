@@ -8,20 +8,16 @@
  - it applies also to any other work released this way by its authors. You can apply it to your programs, too.
  --]]
 
---- @file renderer.lua
+--- @file wireframe.lua
 
-Renderer = {}
+model = nil
 
-Renderer.__instance = seele.Renderer.getInstance()
-
-Renderer.clearWithColor = function(r, g, b)
-    return Renderer.__instance:clearWithColor(r, g, b)
+function onLoad()
+    model = seele.Model("demo/obj/kirby.obj")
+    Renderer.setColor(0x66, 0xcc, 0xff, 0xff)
 end
 
-Renderer.setColor = function(r, g, b, a)
-    return Renderer.__instance:setColor(r, g, b, a)
-end
-
-Renderer.line = function(beginning, ending)
-    return Renderer.__instance:line(beginning, ending)
+function onUpdate(delta)
+    Renderer.clearWithColor(0, 0, 0)
+    model:draw()
 end

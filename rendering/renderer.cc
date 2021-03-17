@@ -10,7 +10,10 @@
 
 /// @file renderer.cc
 
+
 #include "renderer.h"
+
+#include <cmath>
 
 #include "window_manager/window_manager.h"
 
@@ -39,10 +42,70 @@ void Renderer::clearWithColor(const unsigned char& r, const unsigned char& g, co
     auto window = window_manager::Window::getInstance();
     auto size = window->_width * window->_height;
     for (int i = 0; i < size; i++) {
-        window->_buffer2[i * 4] = r;
-        window->_buffer2[i * 4 + 1] = g;
-        window->_buffer2[i * 4 + 2] = b;
-        window->_buffer2[i * 4 + 3] = 255;
+        window->_buffer2[(i << 2)] = r;
+        window->_buffer2[(i << 2) | 1] = g;
+        window->_buffer2[(i << 2) | 2] = b;
+        window->_buffer2[(i << 2) | 3] = 255;
+    }
+}
+
+void Renderer::line(const math::Vector& begin, const math::Vector& end) {
+    int dx = std::fabs(end.x - begin.x), dy = std::fabs(end.y - begin.y);
+    int fx = (end.x - begin.x) / dx, fy = (end.y - begin.y) / dy;
+
+    if (dx == 0) {
+        for (int i = static_cast<int>(begin.y); i != static_cast<int>(end.y); i += fy) {
+            setPixel(begin.x, i);
+        }
+    }
+    else if (dy == 0) {
+        for (int i = static_cast<int>(begin.x); i != static_cast<int>(end.x); i += fx) {
+            setPixel(i, begin.y);
+        }
+    }
+    else if (dx == dy) {
+        for (int i = static_cast<int>(begin.x), j = static_cast<int>(begin.y);
+            i != static_cast<int>(end.x); i += fx, j += fy) {
+            setPixel(i, j);
+        }
+    }
+    else if (dx > dy) {
+        int p = 2 * dy - dx, ddy = 2 * dy, ds = 2 * (dy - dx);
+        setPixel(begin.x, begin.y);
+        for (int i = static_cast<int>(begin.x) + 1, j = static_cast<int>(begin.y); i != static_cast<int>(end.x); i += fx) {
+            if (p < 0) {
+                setPixel(i, j);
+                p += ddy;
+            }
+            else {
+                setPixel(i, ++j);
+                p += ds;
+            }
+        }
+    }
+    else {
+        int p = 2 * dx - dy, ddx = 2 * dx, ds = 2 * (dx - dy);
+        setPixel(begin.x, begin.y);
+        for (int i = static_cast<int>(begin.y) + 1, j = static_cast<int>(begin.x); i != static_cast<int>(end.y); i += fy) {
+            if (p < 0) {
+                setPixel(j, i);
+                p += ddx;
+            }
+            else {
+                setPixel(++j, i);
+                p += ds;
+            }
+        }
+    }
+}
+
+void Renderer::setPixel(const int& x, const int& y) {
+    auto window = window_manager::Window::getInstance();
+    if (x >= 0 && y >= 0 && x < window->_width && y < window->_height) {
+        window->_buffer2[((window->_width * y + x) << 2) | 0] = _r;
+        window->_buffer2[((window->_width * y + x) << 2) | 1] = _g;
+        window->_buffer2[((window->_width * y + x) << 2) | 2] = _b;
+        window->_buffer2[((window->_width * y + x) << 2) | 3] = _a;
     }
 }
 

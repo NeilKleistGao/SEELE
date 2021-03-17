@@ -13,6 +13,10 @@
 #ifndef SEELE_REGISTRATION_H
 #define SEELE_REGISTRATION_H
 
+#include "lua/lua.hpp"
+#include "LuaBridge/LuaBridge.h"
+#include "script/rendering_script.h"
+
 #define __SEELE_CAT(__X__, __Y__) __X__##__Y__
 #define SEELE_CAT(__X__, __Y__) __SEELE_CAT(__X__, __Y__)
 

@@ -13,12 +13,12 @@
 #ifndef SEELE_RENDERER_H
 #define SEELE_RENDERER_H
 
-#include "lua/lua.hpp"
-#include "LuaBridge/LuaBridge.h"
+#include <list>
 
 #include "utils/debug.h"
 #include "utils/registration.h"
 #include "script/rendering_script.h"
+#include "math/vector.h"
 
 namespace rendering {
 
@@ -28,13 +28,23 @@ public:
     static void destroyInstance();
 
     void clearWithColor(const unsigned char& r, const unsigned char& g, const unsigned char& b);
+
+    inline void setColor(const unsigned char& r, const unsigned char& g, const unsigned char& b, const unsigned char& a = 255) {
+        _r = r; _g = g; _b = b; _a = a;
+    }
+
+    void line(const math::Vector& begin, const math::Vector& end);
 private:
     using Debug = utils::Debug;
 
-    Renderer() = default;
+    Renderer() : _r{255}, _g(255), _b(255), _a(255) {};
     ~Renderer() = default;
 
+    void setPixel(const int& x, const int& y);
+
     static Renderer* _instance;
+
+    unsigned char _r, _g, _b, _a;
 };
 
 SEELE_REGISTRATION(Renderer) {
@@ -43,6 +53,8 @@ SEELE_REGISTRATION(Renderer) {
             .beginClass<Renderer>("Renderer")
                 .addStaticFunction("getInstance", &Renderer::getInstance)
                 .addFunction("clearWithColor", &Renderer::clearWithColor)
+                .addFunction("setColor", &Renderer::setColor)
+                .addFunction("line", &Renderer::line)
             .endClass()
         .endNamespace();
 }

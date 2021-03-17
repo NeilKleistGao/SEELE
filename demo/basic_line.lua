@@ -8,20 +8,17 @@
  - it applies also to any other work released this way by its authors. You can apply it to your programs, too.
  --]]
 
---- @file renderer.lua
+--- @file basic_line.lua
 
-Renderer = {}
-
-Renderer.__instance = seele.Renderer.getInstance()
-
-Renderer.clearWithColor = function(r, g, b)
-    return Renderer.__instance:clearWithColor(r, g, b)
+function onLoad()
 end
 
-Renderer.setColor = function(r, g, b, a)
-    return Renderer.__instance:setColor(r, g, b, a)
-end
-
-Renderer.line = function(beginning, ending)
-    return Renderer.__instance:line(beginning, ending)
+function onUpdate(delta)
+    Renderer.clearWithColor(0, 0, 0)
+    Renderer.setColor(0x66, 0xcc, 0xff, 0xff)
+    Renderer.line(seele.Vector(100, 100, 0), seele.Vector(100, 200, 0))
+    Renderer.line(seele.Vector(200, 200, 0), seele.Vector(300, 200, 0))
+    Renderer.line(seele.Vector(300, 300, 0), seele.Vector(400, 400, 0))
+    Renderer.line(seele.Vector(400, 300, 0), seele.Vector(600, 600, 0))
+    Renderer.line(seele.Vector(800, 100, 0), seele.Vector(900, 400, 0))
 end

@@ -8,36 +8,54 @@
  * it applies also to any other work released this way by its authors. You can apply it to your programs, too.
  */
 
-/// @file vector.h
+/// @file model.h
 
-#ifndef SEELE_VECTOR_H
-#define SEELE_VECTOR_H
+#ifndef SEELE_MODEL_H
+#define SEELE_MODEL_H
 
+#include <string>
+#include <vector>
+#include <tuple>
+
+#include "math/vector.h"
 #include "utils/registration.h"
 
-namespace math {
+namespace model {
 
-class Vector {
+class Model {
 public:
-    float x, y, z;
+    explicit Model(const std::string& filename);
 
-    Vector(const float& x, const float& y);
-    explicit Vector(const float& x = 0, const float& y = 0, const float& z = 0);
+    void draw();
 private:
+    using t_face = std::tuple<int, int, int>;
+    using q_face = std::tuple<int, int, int>;
+
+    void processData(const std::string& cmd, const std::string& data);
+
+    template<typename T>
+    T fromString(std::string&& str) {
+        std::stringstream stream;
+        stream << str;
+        T t;
+        stream >> t;
+        return t;
+    }
+
+    std::vector<math::Vector> _vertex;
+    std::vector<t_face> _faces;
 };
 
-SEELE_REGISTRATION(Vector) {
+SEELE_REGISTRATION(Model) {
     luabridge::getGlobalNamespace(script::RenderingScript::getInstance()->getState())
         .beginNamespace("seele")
-            .beginClass<Vector>("Vector")
-                .addProperty("x", &Vector::x, true)
-                .addProperty("y", &Vector::y, true)
-                .addProperty("z", &Vector::z, true)
-                .addConstructor<void (*) (const float &, const float &, const float &)>()
+            .beginClass<Model>("Model")
+                .addConstructor<void (*) (const std::string&)>()
+                .addFunction("draw", &Model::draw)
             .endClass()
         .endNamespace();
 }
 
-} // namespace math
+} // namespace model
 
-#endif //SEELE_VECTOR_H
+#endif //SEELE_MODEL_H

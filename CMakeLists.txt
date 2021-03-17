@@ -17,6 +17,7 @@ include(rendering/CMakeLists.txt)
 include(utils/CMakeLists.txt)
 include(script/CMakeLists.txt)
 include(math/CMakeLists.txt)
+include(model/CMakeLists.txt)
 
 add_executable(SEELE main.cc
         ${WINDOW_MANAGER_HEADERS}
@@ -28,7 +29,9 @@ add_executable(SEELE main.cc
         ${SCRIPT_HEADERS}
         ${SCRIPT_SRCS}
         ${MATH_HEADERS}
-        ${MATH_SRCS})
+        ${MATH_SRCS}
+        ${MODEL_HEADERS}
+        ${MODEL_SRCS})
 
 target_link_libraries(SEELE "${CMAKE_SOURCE_DIR}/${PLATFORM_PREFIX}/libX11.so")
 target_link_libraries(SEELE "${CMAKE_SOURCE_DIR}/${PLATFORM_PREFIX}/libXrand.so")
