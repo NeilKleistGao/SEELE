@@ -28,6 +28,9 @@ Renderer* Renderer::getInstance() {
         }
     }
 
+    auto win = window_manager::Window::getInstance();
+    _instance->_width = win->_width; _instance->_height = win->_height;
+
     return _instance;
 }
 
@@ -53,7 +56,11 @@ void Renderer::line(const math::Vector& begin, const math::Vector& end) {
     int dx = std::fabs(end.x - begin.x), dy = std::fabs(end.y - begin.y);
     int fx = (end.x - begin.x) / dx, fy = (end.y - begin.y) / dy;
 
-    if (dx == 0) {
+    if (dx == 0 && dy == 0) {
+        setPixel(begin.x, begin.y);
+        return;
+    }
+    else if (dx == 0) {
         for (int i = static_cast<int>(begin.y); i != static_cast<int>(end.y); i += fy) {
             setPixel(begin.x, i);
         }
@@ -78,7 +85,8 @@ void Renderer::line(const math::Vector& begin, const math::Vector& end) {
                 p += ddy;
             }
             else {
-                setPixel(i, ++j);
+                j += fy;
+                setPixel(i, j);
                 p += ds;
             }
         }
@@ -92,7 +100,8 @@ void Renderer::line(const math::Vector& begin, const math::Vector& end) {
                 p += ddx;
             }
             else {
-                setPixel(++j, i);
+                j += fx;
+                setPixel(j, i);
                 p += ds;
             }
         }

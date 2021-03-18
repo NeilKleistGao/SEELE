@@ -23,6 +23,14 @@ public:
 
     Vector(const float& x, const float& y);
     explicit Vector(const float& x = 0, const float& y = 0, const float& z = 0);
+
+    Vector& operator+= (const Vector& other);
+
+    inline Vector operator+ (const Vector& other) const {
+        Vector v{x, y, z};
+        v += other;
+        return v;
+    }
 private:
 };
 

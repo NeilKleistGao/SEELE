@@ -27,6 +27,10 @@ public:
     explicit Model(const std::string& filename);
 
     void draw();
+
+    inline void setPosition(const math::Vector& pos) {
+        _position = pos;
+    }
 private:
     using t_face = std::tuple<int, int, int>;
     using q_face = std::tuple<int, int, int>;
@@ -44,6 +48,8 @@ private:
 
     std::vector<math::Vector> _vertex;
     std::vector<t_face> _faces;
+
+    math::Vector _position;
 };
 
 SEELE_REGISTRATION(Model) {
@@ -52,6 +58,7 @@ SEELE_REGISTRATION(Model) {
             .beginClass<Model>("Model")
                 .addConstructor<void (*) (const std::string&)>()
                 .addFunction("draw", &Model::draw)
+                .addFunction("setPosition", &Model::setPosition)
             .endClass()
         .endNamespace();
 }

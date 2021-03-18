@@ -20,4 +20,9 @@ Vector::Vector(const float& x, const float& y) : Vector(x, y, 0) {
 Vector::Vector(const float& x, const float& y, const float& z) : x(x), y(y), z(z) {
 }
 
+Vector& Vector::operator+= (const Vector& other) {
+    x += other.x; y += other.y; z += other.z;
+    return *this;
+}
+
 } // namespace math

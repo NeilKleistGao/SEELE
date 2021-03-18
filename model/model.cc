@@ -27,16 +27,15 @@ Model::Model(const std::string& filename) {
     }
 
     std::string cmd, data;
-    bool is_cmd = false, split = false;
+    bool is_cmd = false;
     while (!std::feof(fp)) {
         char c = fgetc(fp);
-        if (c == ' ' && (!is_cmd || split)) {
+        if (c == ' ') {
             if (!is_cmd) {
                 is_cmd = true;
             }
             else {
-                processData(cmd, data);
-                data = "";
+                data += c;
             }
         }
         else if (!is_cmd && std::isalpha(c)) {
@@ -53,14 +52,10 @@ Model::Model(const std::string& filename) {
             }
 
             is_cmd = false;
-            split = false;
             cmd = "";
             data = "";
         }
         else {
-            if (c == '/') {
-                split = true;
-            }
             data += c;
         }
     }
@@ -71,9 +66,9 @@ Model::Model(const std::string& filename) {
 void Model::draw() {
     auto renderer = rendering::Renderer::getInstance();
     for (const auto& f : _faces) {
-        const auto v0 = _vertex[std::get<0>(f) - 1];
-        const auto v1 = _vertex[std::get<1>(f) - 1];
-        const auto v2 = _vertex[std::get<2>(f) - 1];
+        const auto v0 = _vertex[std::get<0>(f)] + _position;
+        const auto v1 = _vertex[std::get<1>(f)] + _position;
+        const auto v2 = _vertex[std::get<2>(f)] + _position;
 
         renderer->line(v0, v1); renderer->line(v1, v2); renderer->line(v2, v0);
     }
@@ -93,21 +88,24 @@ void Model::processData(const std::string& cmd, const std::string& data) {
         float x = fromString<float>(data.substr(0, pos1)),
                 y = fromString<float>(data.substr(pos1 + 1, pos2 - pos1 - 1)),
                 z = fromString<float>(data.substr(pos2 + 1));
-        _vertex.emplace_back(x + 100, y + 100, z);
+        _vertex.emplace_back(x, y, z);
     }
     else if (cmd == "f") {
         int pos1, pos2;
-        pos1 = data.find_first_of('/'), pos2 = data.find_last_of('/');
+        pos1 = data.find_first_of(' '), pos2 = data.find_last_of(' ');
 
         if (pos1 == -1 || pos2 == -1) {
             return;
         }
 
-        int x = fromString<int>(data.substr(0, pos1)),
-                y = fromString<int>(data.substr(pos1 + 1, pos2 - pos1 - 1)),
-                z = fromString<int>(data.substr(pos2 + 1));
+        std::string temp_x = data.substr(0, pos1),
+                    temp_y = data.substr(pos1 + 1, pos2 - pos1 - 1),
+                    temp_z = data.substr(pos2 + 1);
+        int x = fromString<int>(temp_x.substr(0, temp_x.find_first_of('/'))),
+                y = fromString<int>(temp_y.substr(0, temp_y.find_first_of('/'))),
+                z = fromString<int>(temp_z.substr(0, temp_z.find_first_of('/')));
 
-        _faces.emplace_back(x, y, z);
+        _faces.emplace_back(x - 1, y - 1, z - 1);
     }
 }
 

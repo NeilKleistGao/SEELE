@@ -34,6 +34,14 @@ public:
     }
 
     void line(const math::Vector& begin, const math::Vector& end);
+
+    inline size_t getWidth() const {
+        return _width;
+    }
+
+    inline size_t getHeight() const {
+        return _height;
+    }
 private:
     using Debug = utils::Debug;
 
@@ -45,6 +53,8 @@ private:
     static Renderer* _instance;
 
     unsigned char _r, _g, _b, _a;
+
+    size_t _width, _height;
 };
 
 SEELE_REGISTRATION(Renderer) {

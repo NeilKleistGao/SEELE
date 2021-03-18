@@ -14,7 +14,8 @@ model = nil
 
 function onLoad()
     model = seele.Model("demo/obj/kirby.obj")
-    Renderer.setColor(0x66, 0xcc, 0xff, 0xff)
+    model:setPosition(seele.Vector(512, 384, 0))
+    Renderer.setColor(217, 109, 143, 0xff)
 end
 
 function onUpdate(delta)
