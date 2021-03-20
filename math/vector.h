@@ -31,6 +31,30 @@ public:
         v += other;
         return v;
     }
+
+    Vector& operator^= (const Vector& other);
+
+    inline Vector operator^ (const Vector& other) const {
+        Vector v{x, y, z};
+        v ^= other;
+        return v;
+    }
+
+    inline Vector& operator-= (const Vector& other) {
+        return (*this) += (-other);
+    }
+
+    inline Vector operator- (const Vector& other) const {
+        Vector v{x, y, z};
+        v -= other;
+        return v;
+    }
+
+    inline Vector operator- () const {
+        Vector v{-x, -y, -z};
+        return v;
+    }
+
 private:
 };
 

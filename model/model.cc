@@ -70,7 +70,7 @@ void Model::draw() {
         const auto v1 = _vertex[std::get<1>(f)] + _position;
         const auto v2 = _vertex[std::get<2>(f)] + _position;
 
-        renderer->line(v0, v1); renderer->line(v1, v2); renderer->line(v2, v0);
+        renderer->triangle(v0, v1, v2);
     }
 }
 

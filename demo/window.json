@@ -1,5 +1,5 @@
 {
   "width": 1024,
   "height": 768,
-  "rendering-script": "wireframe.lua"
+  "rendering-script": "triangle.lua"
 }

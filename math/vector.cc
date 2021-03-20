@@ -25,4 +25,12 @@ Vector& Vector::operator+= (const Vector& other) {
     return *this;
 }
 
+Vector& Vector::operator^= (const Vector& other) {
+    float tx = y * other.z - z * other.y,
+          ty = other.x * z - x * other.z,
+          tz = x * other.y - y * other.z;
+    x = tx, y = ty, z = tz;
+    return *this;
+}
+
 } // namespace math

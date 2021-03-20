@@ -14,6 +14,7 @@
 #include "renderer.h"
 
 #include <cmath>
+#include <algorithm>
 
 #include "window_manager/window_manager.h"
 
@@ -116,6 +117,27 @@ void Renderer::setPixel(const int& x, const int& y) {
         window->_buffer2[((window->_width * y + x) << 2) | 2] = _b;
         window->_buffer2[((window->_width * y + x) << 2) | 3] = _a;
     }
+}
+
+void Renderer::triangle(math::Vector v1, math::Vector v2, math::Vector v3) {
+    auto e = v1 - v2;
+    if (std::abs(e.x * v3.y - e.y * v3.x) < EPSILON) {
+        this->line(v1, v2); this->line(v2, v3);
+        return;
+    }
+
+    if (v1.y > v2.y) {
+        std::swap(v1, v2);
+    }
+    if (v1.y > v3.y) {
+        std::swap(v1, v3);
+    }
+    if (v2.y > v3.y) {
+        std::swap(v2, v3);
+    }
+
+    float height = v3.y - v1.y;
+
 }
 
 } // namespace rendering

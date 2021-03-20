@@ -35,6 +35,8 @@ public:
 
     void line(const math::Vector& begin, const math::Vector& end);
 
+    void triangle(math::Vector v1, math::Vector v2, math::Vector v3);
+
     inline size_t getWidth() const {
         return _width;
     }
@@ -55,6 +57,8 @@ private:
     unsigned char _r, _g, _b, _a;
 
     size_t _width, _height;
+
+    static constexpr float EPSILON = 1e-8;
 };
 
 SEELE_REGISTRATION(Renderer) {
@@ -65,6 +69,7 @@ SEELE_REGISTRATION(Renderer) {
                 .addFunction("clearWithColor", &Renderer::clearWithColor)
                 .addFunction("setColor", &Renderer::setColor)
                 .addFunction("line", &Renderer::line)
+                .addFunction("triangle", &Renderer::triangle)
             .endClass()
         .endNamespace();
 }
