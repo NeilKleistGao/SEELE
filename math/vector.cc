@@ -33,4 +33,9 @@ Vector& Vector::operator^= (const Vector& other) {
     return *this;
 }
 
+Vector& Vector::operator*= (const float& f) {
+    x *= f; y *= f; z *= f;
+    return *this;
+}
+
 } // namespace math

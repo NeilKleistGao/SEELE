@@ -55,8 +55,18 @@ public:
         return v;
     }
 
+    Vector& operator*= (const float& f);
+    inline Vector operator* (const float& f) const {
+        Vector v{x * f, y * f, z * f};
+        return v;
+    }
+
 private:
 };
+
+inline Vector operator* (const float& f, const Vector& v) {
+    return v * f;
+}
 
 SEELE_REGISTRATION(Vector) {
     luabridge::getGlobalNamespace(script::RenderingScript::getInstance()->getState())

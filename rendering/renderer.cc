@@ -136,8 +136,41 @@ void Renderer::triangle(math::Vector v1, math::Vector v2, math::Vector v3) {
         std::swap(v2, v3);
     }
 
-    float height = v3.y - v1.y;
+    if (v2.y - v1.y <= 1.0f) {
+        float height = v3.y - v1.y;
+        auto inc1 = (v3 - v1) * (1.0f / height), inc2 = (v3 - v2) * (1.0f / height);
+        auto sd1 = v1, sd2 = v2;
+        for (int i = static_cast<int>(v1.y); i < static_cast<int>(v3.y); ++i) {
+            sd1 += inc1; sd2 += inc2;
+            this->line(sd1, sd2);
+        }
+    }
+    else if (v3.y - v2.y <= 1.0f) {
+        float height = v3.y - v1.y;
+        auto inc1 = (v2 - v1) * (1.0f / height), inc2 = (v3 - v1) * (1.0f / height);
+        auto sd1 = v1, sd2 = v1;
+        for (int i = static_cast<int>(v1.y); i < static_cast<int>(v3.y); ++i) {
+            sd1 += inc1; sd2 += inc2;
+            this->line(sd1, sd2);
+        }
+    }
+    else {
+        float height = v3.y - v1.y, sub_height = v2.y - v1.y;
+        auto inc1 = (v3 - v1) * (1.0f / height), inc2 = (v2 - v1) * (1.0f / sub_height);
+        auto sd1 = v1, sd2 = v1;
+        for (int i = static_cast<int>(v1.y); i < static_cast<int>(v2.y); ++i) {
+            sd1 += inc1; sd2 += inc2;
+            this->line(sd1, sd2);
+        }
 
+        sub_height = v3.y - v2.y;
+        inc1 = (v3 - v1) * (1.0f / height), inc2 = (v3 - v2) * (1.0f / sub_height);
+        sd1 = v2, sd2 = v2;
+        for (int i = static_cast<int>(v2.y); i < static_cast<int>(v3.y); ++i) {
+            sd1 += inc1; sd2 += inc2;
+            this->line(sd1, sd2);
+        }
+    }
 }
 
 } // namespace rendering

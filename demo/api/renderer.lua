@@ -15,13 +15,17 @@ Renderer = {}
 Renderer.__instance = seele.Renderer.getInstance()
 
 Renderer.clearWithColor = function(r, g, b)
-    return Renderer.__instance:clearWithColor(r, g, b)
+    Renderer.__instance:clearWithColor(r, g, b)
 end
 
 Renderer.setColor = function(r, g, b, a)
-    return Renderer.__instance:setColor(r, g, b, a)
+    Renderer.__instance:setColor(r, g, b, a)
 end
 
 Renderer.line = function(beginning, ending)
-    return Renderer.__instance:line(beginning, ending)
+    Renderer.__instance:line(beginning, ending)
+end
+
+Renderer.triangle = function(v1, v2, v3)
+    Renderer.__instance:triangle(v1, v2, v3)
 end
