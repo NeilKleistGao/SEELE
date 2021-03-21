@@ -31,6 +31,7 @@ int main(int argc, char* argv[]) {
 
     auto base = std::filesystem::path{std::string{argv[1]}};
     auto win_doc = utils::JsonParser::parseDocument(std::filesystem::path{base} /= "window.json");
+    auto rd_doc = utils::JsonParser::parseDocument(std::filesystem::path{base} /= "rendering.json");
     auto win = window_manager::Window::getInstance(win_doc["width"].GetInt(), win_doc["height"].GetInt(), TITLE);
 
     auto rs = script::RenderingScript::getInstance();

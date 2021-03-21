@@ -76,7 +76,6 @@ void Model::draw() {
         const auto v2 = trans * _vertex[std::get<2>(f)];
 
         renderer->triangle(v0, v1, v2);
-//        renderer->line(v0, v1);renderer->line(v2, v1);renderer->line(v0, v2);
     }
 }
 
@@ -91,7 +90,7 @@ void Model::processData(const std::string& cmd, const std::string& data) {
             return;
         }
 
-        float x = fromString<float>(data.substr(0, pos1)),
+        auto x = fromString<float>(data.substr(0, pos1)),
                 y = fromString<float>(data.substr(pos1 + 1, pos2 - pos1 - 1)),
                 z = fromString<float>(data.substr(pos2 + 1));
         _vertex.emplace_back(x, y, z);

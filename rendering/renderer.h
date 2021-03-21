@@ -44,19 +44,36 @@ public:
     inline size_t getHeight() const {
         return _height;
     }
+
+    void flush();
+
+    enum class CullingFace {
+        NONE = 0,
+        FRONT_FACE = 1,
+        BACK_FACE = 2
+    };
+
+    inline void setCullingFace(const CullingFace& face) {
+        _enable_back_face_culling = face;
+    }
+
 private:
     using Debug = utils::Debug;
 
-    Renderer() : _r{255}, _g(255), _b(255), _a(255) {};
+    Renderer() : _r{255}, _g(255), _b(255), _a(255), _enable_back_face_culling(CullingFace::NONE) {};
     ~Renderer() = default;
 
     void setPixel(const int& x, const int& y);
+
+    bool cullBackFace(math::Vector v1, math::Vector v2, math::Vector v3);
 
     static Renderer* _instance;
 
     unsigned char _r, _g, _b, _a;
 
     size_t _width, _height;
+
+    CullingFace _enable_back_face_culling;
 
     static constexpr float EPSILON = 1e-8;
 };
@@ -70,6 +87,7 @@ SEELE_REGISTRATION(Renderer) {
                 .addFunction("setColor", &Renderer::setColor)
                 .addFunction("line", &Renderer::line)
                 .addFunction("triangle", &Renderer::triangle)
+                .addFunction("flush", &Renderer::flush)
             .endClass()
         .endNamespace();
 }

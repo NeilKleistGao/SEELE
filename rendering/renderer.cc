@@ -17,6 +17,7 @@
 #include <algorithm>
 
 #include "window_manager/window_manager.h"
+#include "camera.h"
 
 namespace rendering {
 Renderer* Renderer::_instance = nullptr;
@@ -54,8 +55,9 @@ void Renderer::clearWithColor(const unsigned char& r, const unsigned char& g, co
 }
 
 void Renderer::line(const math::Vector& begin, const math::Vector& end) {
-    int dx = std::fabs(end.x - begin.x), dy = std::fabs(end.y - begin.y);
-    int fx = (end.x - begin.x) / dx, fy = (end.y - begin.y) / dy;
+    int dx = std::round(std::fabs(end.x - begin.x)),
+    dy = std::round(std::fabs(end.y - begin.y));
+    int fx = (end.x > begin.x) ? 1 : -1, fy = (end.y > begin.y) ? 1 : -1;
 
     if (dx == 0 && dy == 0) {
         setPixel(begin.x, begin.y);
@@ -96,7 +98,7 @@ void Renderer::line(const math::Vector& begin, const math::Vector& end) {
         int p = 2 * dx - dy, ddx = 2 * dx, ds = 2 * (dx - dy);
         setPixel(begin.x, begin.y);
         for (int i = static_cast<int>(begin.y) + 1, j = static_cast<int>(begin.x); i != static_cast<int>(end.y); i += fy) {
-            if (p < 0) {
+            if (p > 0) {
                 setPixel(j, i);
                 p += ddx;
             }
@@ -107,6 +109,8 @@ void Renderer::line(const math::Vector& begin, const math::Vector& end) {
             }
         }
     }
+
+    setPixel(end.x, end.y);
 }
 
 void Renderer::setPixel(const int& x, const int& y) {
@@ -120,6 +124,10 @@ void Renderer::setPixel(const int& x, const int& y) {
 }
 
 void Renderer::triangle(math::Vector v1, math::Vector v2, math::Vector v3) {
+    if (cullBackFace(v1, v2, v3)) {
+        return;
+    }
+
     auto e = v1 - v2;
     if (std::abs(e.x * v3.y - e.y * v3.x) < EPSILON) {
         this->line(v1, v2); this->line(v2, v3);
@@ -136,41 +144,40 @@ void Renderer::triangle(math::Vector v1, math::Vector v2, math::Vector v3) {
         std::swap(v2, v3);
     }
 
-    if (v2.y - v1.y <= 1.0f) {
-        float height = v3.y - v1.y;
-        auto inc1 = (v3 - v1) * (1.0f / height), inc2 = (v3 - v2) * (1.0f / height);
-        auto sd1 = v1, sd2 = v2;
-        for (int i = static_cast<int>(v1.y); i < static_cast<int>(v3.y); ++i) {
-            sd1 += inc1; sd2 += inc2;
-            this->line(sd1, sd2);
-        }
+    float height = v3.y - v1.y, sub_height = v2.y - v1.y + 1;
+    auto inc1 = (v3.x - v1.x) * (1.0f / height), inc2 = (v2.x - v1.x) * (1.0f / sub_height);
+    auto sd1 = v1, sd2 = v1;
+    for (int i = static_cast<int>(v1.y); i <= static_cast<int>(v2.y); ++i) {
+        sd1.y = sd2.y = i;
+        this->line(sd1, sd2);
+        sd1.x += inc1; sd2.x += inc2;
     }
-    else if (v3.y - v2.y <= 1.0f) {
-        float height = v3.y - v1.y;
-        auto inc1 = (v2 - v1) * (1.0f / height), inc2 = (v3 - v1) * (1.0f / height);
-        auto sd1 = v1, sd2 = v1;
-        for (int i = static_cast<int>(v1.y); i < static_cast<int>(v3.y); ++i) {
-            sd1 += inc1; sd2 += inc2;
-            this->line(sd1, sd2);
-        }
-    }
-    else {
-        float height = v3.y - v1.y, sub_height = v2.y - v1.y;
-        auto inc1 = (v3 - v1) * (1.0f / height), inc2 = (v2 - v1) * (1.0f / sub_height);
-        auto sd1 = v1, sd2 = v1;
-        for (int i = static_cast<int>(v1.y); i < static_cast<int>(v2.y); ++i) {
-            sd1 += inc1; sd2 += inc2;
-            this->line(sd1, sd2);
-        }
 
-        sub_height = v3.y - v2.y;
-        inc1 = (v3 - v1) * (1.0f / height), inc2 = (v3 - v2) * (1.0f / sub_height);
-        sd1 = v2, sd2 = v2;
-        for (int i = static_cast<int>(v2.y); i < static_cast<int>(v3.y); ++i) {
-            sd1 += inc1; sd2 += inc2;
-            this->line(sd1, sd2);
-        }
+    sub_height = v3.y - v2.y + 1;
+    inc2 = (v3.x - v2.x) * (1.0f / sub_height);
+    sd2 = v2;
+    for (int i = static_cast<int>(v2.y); i <= static_cast<int>(v3.y); ++i) {
+        sd1.y = sd2.y = i;
+        this->line(sd1, sd2);
+        sd1.x += inc1; sd2.x += inc2;
     }
+}
+
+void Renderer::flush() {
+    auto window = window_manager::Window::getInstance();
+    window->display();
+}
+
+bool Renderer::cullBackFace(math::Vector v1, math::Vector v2, math::Vector v3) {
+    if (_enable_back_face_culling == CullingFace::NONE) {
+        return false;
+    }
+
+    auto e1 = v1 - v2, e2 = v2 - v3;
+    auto norm = e1 ^ e2;
+    auto dot = norm * Camera::getInstance()->getPosition();
+    return (dot >= 0 && _enable_back_face_culling == CullingFace::BACK_FACE) ||
+    (dot <= 0 && _enable_back_face_culling == CullingFace::FRONT_FACE);
 }
 
 } // namespace rendering

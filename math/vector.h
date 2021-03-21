@@ -63,6 +63,10 @@ public:
         return v;
     }
 
+    inline float operator* (const Vector& other) const {
+        return x * other.x + y * other.y + z * other.z + w * other.w;
+    }
+
 private:
 };
 
