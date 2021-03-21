@@ -11,9 +11,10 @@
 --- @file model.lua
 
 function onLoad()
-    model = seele.Model("demo/obj/kirby.obj")
+    model = seele.Model("demo/obj/african_head.obj")
+    model:setScale(seele.Vector(450, 450, 450))
     model:setPosition(seele.Vector(512, 384, 0))
-    Renderer.setColor(217, 109, 143, 0xff)
+    Renderer.setColor(245, 245, 245, 0xff)
 end
 
 function onUpdate(delta)

@@ -17,10 +17,11 @@
 
 #include "utils/debug.h"
 #include "rendering/renderer.h"
+#include "math/matrix.h"
 
 namespace model {
 
-Model::Model(const std::string& filename) {
+Model::Model(const std::string& filename) : _position(), _scale(1, 1, 1) {
     FILE* fp = fopen(filename.c_str(), "r");
     if (fp == nullptr) {
         utils::Debug::terminate("can't load model " + filename);
@@ -65,12 +66,17 @@ Model::Model(const std::string& filename) {
 
 void Model::draw() {
     auto renderer = rendering::Renderer::getInstance();
+
+    math::Matrix trans{};
+    trans.scale(_scale).move(_position);
+
     for (const auto& f : _faces) {
-        const auto v0 = _vertex[std::get<0>(f)] + _position;
-        const auto v1 = _vertex[std::get<1>(f)] + _position;
-        const auto v2 = _vertex[std::get<2>(f)] + _position;
+        const auto v0 = trans * _vertex[std::get<0>(f)];
+        const auto v1 = trans * _vertex[std::get<1>(f)];
+        const auto v2 = trans * _vertex[std::get<2>(f)];
 
         renderer->triangle(v0, v1, v2);
+//        renderer->line(v0, v1);renderer->line(v2, v1);renderer->line(v0, v2);
     }
 }
 

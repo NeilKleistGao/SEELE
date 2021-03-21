@@ -19,15 +19,17 @@ namespace math {
 
 class Vector {
 public:
-    float x, y, z;
+    float x, y, z, w;
+
+    static const Vector X, Y, Z;
 
     Vector(const float& x, const float& y);
-    explicit Vector(const float& x = 0, const float& y = 0, const float& z = 0);
+    explicit Vector(const float& x = 0, const float& y = 0, const float& z = 0, const float& w = 1);
 
     Vector& operator+= (const Vector& other);
 
     inline Vector operator+ (const Vector& other) const {
-        Vector v{x, y, z};
+        Vector v{x, y, z, w};
         v += other;
         return v;
     }
@@ -35,7 +37,7 @@ public:
     Vector& operator^= (const Vector& other);
 
     inline Vector operator^ (const Vector& other) const {
-        Vector v{x, y, z};
+        Vector v{x, y, z, w};
         v ^= other;
         return v;
     }
@@ -45,19 +47,19 @@ public:
     }
 
     inline Vector operator- (const Vector& other) const {
-        Vector v{x, y, z};
+        Vector v{x, y, z, w};
         v -= other;
         return v;
     }
 
     inline Vector operator- () const {
-        Vector v{-x, -y, -z};
+        Vector v{-x, -y, -z, -w};
         return v;
     }
 
     Vector& operator*= (const float& f);
     inline Vector operator* (const float& f) const {
-        Vector v{x * f, y * f, z * f};
+        Vector v{x * f, y * f, z * f, w * f};
         return v;
     }
 

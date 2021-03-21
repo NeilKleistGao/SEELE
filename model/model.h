@@ -31,6 +31,10 @@ public:
     inline void setPosition(const math::Vector& pos) {
         _position = pos;
     }
+
+    inline void setScale(const math::Vector& scale) {
+        _scale = scale;
+    }
 private:
     using t_face = std::tuple<int, int, int>;
     using q_face = std::tuple<int, int, int>;
@@ -50,6 +54,7 @@ private:
     std::vector<t_face> _faces;
 
     math::Vector _position;
+    math::Vector _scale;
 };
 
 SEELE_REGISTRATION(Model) {
@@ -59,6 +64,7 @@ SEELE_REGISTRATION(Model) {
                 .addConstructor<void (*) (const std::string&)>()
                 .addFunction("draw", &Model::draw)
                 .addFunction("setPosition", &Model::setPosition)
+                .addFunction("setScale", &Model::setScale)
             .endClass()
         .endNamespace();
 }

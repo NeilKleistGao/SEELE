@@ -8,38 +8,47 @@
  * it applies also to any other work released this way by its authors. You can apply it to your programs, too.
  */
 
-/// @file vector.h
+/// @file matrix.h
+
+#ifndef SEELE_MATRIX_H
+#define SEELE_MATRIX_H
+
+#include <array>
 
 #include "vector.h"
 
 namespace math {
+class Matrix {
+public:
+    Matrix();
+    ~Matrix() = default;
 
-const Vector Vector::X = Vector{1, 0, 0, 0};
-const Vector Vector::Y = Vector{0,1, 0, 0};
-const Vector Vector::Z = Vector{0, 0, 1, 0};
+    Matrix(const Matrix& other) {
+        for (int i = 0; i < SIZE; ++i) {
+            _mat[i] = other._mat[i];
+        }
+    }
 
-Vector::Vector(const float& x, const float& y) : Vector(x, y, 0, 1) {
-}
+    Matrix& operator= (const Matrix& other) {
+        for (int i = 0; i < SIZE; ++i) {
+            _mat[i] = other._mat[i];
+        }
+        return *this;
+    }
 
-Vector::Vector(const float& x, const float& y, const float& z, const float& w) : x(x), y(y), z(z), w(w) {
-}
+    Matrix operator* (const Matrix& other);
+    Matrix& operator*=(const Matrix& other);
 
-Vector& Vector::operator+= (const Vector& other) {
-    x += other.x; y += other.y; z += other.z; w += other.w;
-    return *this;
-}
+    Vector operator* (const Vector& v);
 
-Vector& Vector::operator^= (const Vector& other) {
-    float tx = y * other.z - z * other.y,
-          ty = other.x * z - x * other.z,
-          tz = x * other.y - y * other.z;
-    x = tx, y = ty, z = tz;
-    return *this;
-}
+    Matrix& move(const Vector& fwd);
+    Matrix& scale(const Vector& scl);
 
-Vector& Vector::operator*= (const float& f) {
-    x *= f; y *= f; z *= f; w *= f;
-    return *this;
-}
-
+private:
+    static constexpr size_t WIDTH = 4;
+    static constexpr size_t SIZE = WIDTH*WIDTH;
+    std::array<float, SIZE> _mat;
+};
 } // namespace math
+
+#endif //SEELE_MATRIX_H
