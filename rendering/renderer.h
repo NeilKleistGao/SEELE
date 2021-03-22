@@ -60,10 +60,10 @@ public:
 private:
     using Debug = utils::Debug;
 
-    Renderer() : _r{255}, _g(255), _b(255), _a(255), _enable_back_face_culling(CullingFace::NONE) {};
+    Renderer() : _r{255}, _g(255), _b(255), _a(255), _enable_back_face_culling(CullingFace::NONE), _z_buffer(nullptr) {};
     ~Renderer() = default;
 
-    void setPixel(const int& x, const int& y);
+    void setPixel(const int& x, const int& y, const int& z = 0);
 
     bool cullBackFace(math::Vector v1, math::Vector v2, math::Vector v3);
 
@@ -74,6 +74,8 @@ private:
     size_t _width, _height;
 
     CullingFace _enable_back_face_culling;
+
+    int* _z_buffer;
 
     static constexpr float EPSILON = 1e-8;
 };
