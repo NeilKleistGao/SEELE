@@ -19,12 +19,13 @@
 
 #include "math/vector.h"
 #include "utils/registration.h"
+#include "tga/tgaimage.h"
 
 namespace model {
 
 class Model {
 public:
-    explicit Model(const std::string& filename);
+    explicit Model(const std::string& filename, const std::string& texture = "");
 
     void draw();
 
@@ -50,18 +51,24 @@ private:
         return t;
     }
 
+    void loadTexture(const std::string& texture);
+
     std::vector<math::Vector> _vertex;
+    std::vector<math::Vector> _text_coord;
     std::vector<t_face> _faces;
+    std::vector<t_face> _text_index;
 
     math::Vector _position;
     math::Vector _scale;
+
+    TGAImage* _texture;
 };
 
 SEELE_REGISTRATION(Model) {
     luabridge::getGlobalNamespace(script::RenderingScript::getInstance()->getState())
         .beginNamespace("seele")
             .beginClass<Model>("Model")
-                .addConstructor<void (*) (const std::string&)>()
+                .addConstructor<void (*) (const std::string&, const std::string&)>()
                 .addFunction("draw", &Model::draw)
                 .addFunction("setPosition", &Model::setPosition)
                 .addFunction("setScale", &Model::setScale)

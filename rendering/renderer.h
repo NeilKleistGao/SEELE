@@ -14,11 +14,13 @@
 #define SEELE_RENDERER_H
 
 #include <list>
+#include <array>
 
 #include "utils/debug.h"
 #include "utils/registration.h"
 #include "script/rendering_script.h"
 #include "math/vector.h"
+#include "tga/tgaimage.h"
 
 namespace rendering {
 
@@ -37,6 +39,9 @@ public:
 
     void triangle(math::Vector v1, math::Vector v2, math::Vector v3);
 
+    void triangleWithTexture(math::Vector v1, math::Vector v2, math::Vector v3,
+                             const math::Vector& tv1, const math::Vector& tv2, const math::Vector& tv3);
+
     inline size_t getWidth() const {
         return _width;
     }
@@ -53,14 +58,18 @@ public:
         BACK_FACE = 2
     };
 
-    inline void setCullingFace(const CullingFace& face) {
-        _enable_back_face_culling = face;
+    inline void setCullingFace(const int& face) {
+        _enable_back_face_culling = static_cast<CullingFace>(face);
+    }
+
+    inline void bindTexture(TGAImage* texture) {
+        _texture = texture;
     }
 
 private:
     using Debug = utils::Debug;
 
-    Renderer() : _r{255}, _g(255), _b(255), _a(255), _enable_back_face_culling(CullingFace::NONE), _z_buffer(nullptr) {};
+    Renderer();
     ~Renderer() = default;
 
     void setPixel(const int& x, const int& y, const int& z = 0);
@@ -77,6 +86,8 @@ private:
 
     int* _z_buffer;
 
+    TGAImage* _texture;
+
     static constexpr float EPSILON = 1e-8;
 };
 
@@ -90,6 +101,7 @@ SEELE_REGISTRATION(Renderer) {
                 .addFunction("line", &Renderer::line)
                 .addFunction("triangle", &Renderer::triangle)
                 .addFunction("flush", &Renderer::flush)
+                .addFunction("setCullingFace", &Renderer::setCullingFace)
             .endClass()
         .endNamespace();
 }

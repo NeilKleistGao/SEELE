@@ -15,13 +15,17 @@
 
 #include <cmath>
 #include <algorithm>
-#include <climits>
 
 #include "window_manager/window_manager.h"
 #include "camera.h"
 
 namespace rendering {
 Renderer* Renderer::_instance = nullptr;
+
+Renderer::Renderer() : _r{255}, _g(255), _b(255), _a(255),
+                        _enable_back_face_culling(CullingFace::NONE),
+                        _z_buffer(nullptr), _texture(nullptr) {
+}
 
 Renderer* Renderer::getInstance() {
     if (_instance == nullptr) {
@@ -208,6 +212,70 @@ bool Renderer::cullBackFace(math::Vector v1, math::Vector v2, math::Vector v3) {
     auto dot = norm * Camera::getInstance()->getPosition();
     return (dot >= 0 && _enable_back_face_culling == CullingFace::BACK_FACE) ||
     (dot <= 0 && _enable_back_face_culling == CullingFace::FRONT_FACE);
+}
+
+void Renderer::triangleWithTexture(math::Vector v1, math::Vector v2, math::Vector v3,
+                             const math::Vector& tv1, const math::Vector& tv2, const math::Vector& tv3) {
+    if (cullBackFace(v1, v2, v3) || _texture == nullptr) {
+        return;
+    }
+
+    auto e = v1 - v2;
+    if (std::abs(e.x * v3.y - e.y * v3.x) < EPSILON) {
+        this->line(v1, v2); this->line(v2, v3);
+        return;
+    }
+
+    if (v1.y > v2.y) {
+        std::swap(v1, v2);
+    }
+    if (v1.y > v3.y) {
+        std::swap(v1, v3);
+    }
+    if (v2.y > v3.y) {
+        std::swap(v2, v3);
+    }
+
+    float height = v3.y - v1.y, sub_height = v2.y - v1.y + 1;
+    auto inc1 = (v3.x - v1.x) * (1.0f / height), inc2 = (v2.x - v1.x) * (1.0f / sub_height);
+    auto sd1 = v1, sd2 = v1;
+    auto texture_size = math::Vector{_texture->get_width(), _texture->get_height(), 0};
+    for (int i = std::round(v1.y); i <= std::round(v2.y); ++i) {
+        sd1.y = sd2.y = i;
+        int min = std::min(std::round(sd1.x), std::round(sd2.x)), max = std::max(std::round(sd1.x), std::round(sd2.x));
+        for (int j = min; j <= max; ++j) {
+            float u = (-(j - v2.x) * (v3.y - v2.y) + (i - v2.y) * (v3.x - v2.x))
+                      / (-(v1.x - v2.x) * (v3.y - v2.y) + (v1.y - v2.y) * (v3.x - v2.x)),
+                    v = (-(j - v3.x) * (v1.y - v3.y) + (i - v3.y) * (v1.x - v3.x))
+                        / (-(v2.x - v3.x) * (v1.y - v3.y) + (v2.y - v3.y) * (v1.x - v3.x)),
+                    w = 1 - u - v;
+            auto tv = tv1 * u + tv2 * v + tv3 * w;
+            auto color = _texture->get(texture_size.x * tv.x, texture_size.y * tv.y);
+            setColor(color.r, color.g, color.b, color.a);
+            setPixel(j, i, v1.z * u + v2.z * v + v3.z * w);
+        }
+        sd1.x += inc1; sd2.x += inc2;
+    }
+
+    sub_height = v3.y - v2.y + 1;
+    inc2 = (v3.x - v2.x) * (1.0f / sub_height);
+    sd2 = v2;
+    for (int i = std::round(v2.y); i <= std::round(v3.y); ++i) {
+        sd1.y = sd2.y = i;
+        int min = std::min(std::round(sd1.x), std::round(sd2.x)), max = std::max(std::round(sd1.x), std::round(sd2.x));
+        for (int j = min; j <= max; ++j) {
+            float u = (-(j - v2.x) * (v3.y - v2.y) + (i - v2.y) * (v3.x - v2.x))
+                      / (-(v1.x - v2.x) * (v3.y - v2.y) + (v1.y - v2.y) * (v3.x - v2.x)),
+                    v = (-(j - v3.x) * (v1.y - v3.y) + (i - v3.y) * (v1.x - v3.x))
+                        / (-(v2.x - v3.x) * (v1.y - v3.y) + (v2.y - v3.y) * (v1.x - v3.x)),
+                    w = 1 - u - v;
+            auto tv = tv1 * u + tv2 * v + tv3 * w;
+            auto color = _texture->get(texture_size.x * tv.x, texture_size.y * tv.y);
+            setColor(color.r, color.g, color.b, color.a);
+            setPixel(j, i, v1.z * u + v2.z * v + v3.z * w);
+        }
+        sd1.x += inc1; sd2.x += inc2;
+    }
 }
 
 } // namespace rendering

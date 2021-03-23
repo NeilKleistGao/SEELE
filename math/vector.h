@@ -23,7 +23,6 @@ public:
 
     static const Vector X, Y, Z;
 
-    Vector(const float& x, const float& y);
     explicit Vector(const float& x = 0, const float& y = 0, const float& z = 0, const float& w = 1);
 
     Vector& operator+= (const Vector& other);

@@ -14,12 +14,18 @@
 #define SEELE_DEBUG_H
 
 #include <string>
+#include <iostream>
 
 namespace utils {
 
 class Debug {
 public:
     static void terminate(const std::string& content, const int& error = -1);
+
+    template<typename T>
+    static void log(T t) {
+        std::cout << t << std::endl;
+    }
 private:
 };
 

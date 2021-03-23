@@ -11,10 +11,9 @@
 --- @file model.lua
 
 function onLoad()
-    model = seele.Model("demo/obj/african_head.obj")
+    model = seele.Model("demo/obj/african_head.obj", "demo/texture/african_head_diffuse.tga")
     model:setScale(seele.Vector(450, 450, 450))
     model:setPosition(seele.Vector(512, 384, 0))
-    Renderer.setColor(245, 245, 245, 0xff)
 end
 
 function onUpdate(delta)

@@ -14,6 +14,7 @@
 
 #include <cstdio>
 #include <cctype>
+#include <filesystem>
 
 #include "utils/debug.h"
 #include "rendering/renderer.h"
@@ -21,7 +22,7 @@
 
 namespace model {
 
-Model::Model(const std::string& filename) : _position(), _scale(1, 1, 1) {
+Model::Model(const std::string& filename, const std::string& texture) : _position(), _scale(1, 1, 1) {
     FILE* fp = fopen(filename.c_str(), "r");
     if (fp == nullptr) {
         utils::Debug::terminate("can't load model " + filename);
@@ -34,6 +35,9 @@ Model::Model(const std::string& filename) : _position(), _scale(1, 1, 1) {
         if (c == ' ') {
             if (!is_cmd) {
                 is_cmd = true;
+                if (cmd.length() > 1) {
+                    c = fgetc(fp);
+                }
             }
             else {
                 data += c;
@@ -46,6 +50,10 @@ Model::Model(const std::string& filename) : _position(), _scale(1, 1, 1) {
             while (!std::feof(fp) && c != '\n') {
                 c = fgetc(fp);
             }
+
+            is_cmd = false;
+            cmd = "";
+            data = "";
         }
         else if (c == '\n' || c == '\r') {
             if (is_cmd) {
@@ -62,6 +70,7 @@ Model::Model(const std::string& filename) : _position(), _scale(1, 1, 1) {
     }
 
     fclose(fp);
+    loadTexture(texture);
 }
 
 void Model::draw() {
@@ -70,12 +79,17 @@ void Model::draw() {
     math::Matrix trans{};
     trans.scale(_scale).move(_position);
 
-    for (const auto& f : _faces) {
+    for (int i = 0; i < _faces.size(); ++i) {
+        const auto f = _faces[i];
+        const auto ti = _text_index[i];
         const auto v0 = trans * _vertex[std::get<0>(f)];
         const auto v1 = trans * _vertex[std::get<1>(f)];
         const auto v2 = trans * _vertex[std::get<2>(f)];
+        const auto tv0 = _text_coord[std::get<0>(ti)];
+        const auto tv1 = _text_coord[std::get<1>(ti)];
+        const auto tv2 = _text_coord[std::get<2>(ti)];
 
-        renderer->triangle(v0, v1, v2);
+        renderer->triangleWithTexture(v0, v1, v2, tv0, tv1, tv2);
     }
 }
 
@@ -106,12 +120,48 @@ void Model::processData(const std::string& cmd, const std::string& data) {
         std::string temp_x = data.substr(0, pos1),
                     temp_y = data.substr(pos1 + 1, pos2 - pos1 - 1),
                     temp_z = data.substr(pos2 + 1);
-        int x = fromString<int>(temp_x.substr(0, temp_x.find_first_of('/'))),
-                y = fromString<int>(temp_y.substr(0, temp_y.find_first_of('/'))),
-                z = fromString<int>(temp_z.substr(0, temp_z.find_first_of('/')));
+        auto xp1 = temp_x.find_first_of('/'), xp2 = temp_x.find_last_of('/'),
+             yp1 = temp_y.find_first_of('/'), yp2 = temp_y.find_last_of('/'),
+             zp1 = temp_z.find_first_of('/'), zp2 = temp_z.find_last_of('/');
+
+        int x = fromString<int>(temp_x.substr(0, xp1)),
+                y = fromString<int>(temp_y.substr(0, yp1)),
+                z = fromString<int>(temp_z.substr(0, zp1));
 
         _faces.emplace_back(x - 1, y - 1, z - 1);
+
+        x = fromString<int>(temp_x.substr(xp1 + 1, xp2 - xp1)),
+        y = fromString<int>(temp_y.substr(yp1 + 1, yp2 - yp1)),
+        z = fromString<int>(temp_z.substr(zp1 + 1, zp2 - zp1));
+
+        _text_index.emplace_back(x - 1, y - 1, z - 1);
     }
+    else if (cmd == "vt") {
+        int pos1, pos2;
+        pos1 = data.find_first_of(' '), pos2 = data.find_last_of(' ');
+
+        if (pos1 == -1 || pos2 == -1) {
+            return;
+        }
+
+        auto x = fromString<float>(data.substr(0, pos1)),
+                y = fromString<float>(data.substr(pos1 + 1, pos2 - pos1 - 1)),
+                z = fromString<float>(data.substr(pos2 + 1));
+        _text_coord.emplace_back(x, 1 - y, z);
+    }
+}
+
+void Model::loadTexture(const std::string& texture) {
+    if (texture.empty()) {
+        return;
+    }
+
+    _texture = new TGAImage();
+    if (!_texture->read_tga_file(texture.c_str())) {
+        utils::Debug::terminate("Can't load texture " + texture);
+    }
+
+    rendering::Renderer::getInstance()->bindTexture(_texture);
 }
 
 } // namespace model

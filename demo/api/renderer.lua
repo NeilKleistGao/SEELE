@@ -29,3 +29,7 @@ end
 Renderer.triangle = function(v1, v2, v3)
     Renderer.__instance:triangle(v1, v2, v3)
 end
+
+Renderer.setCullingFace = function(face)
+    Renderer.__instance:setCullingFace(face)
+end
