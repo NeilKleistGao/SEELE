@@ -80,7 +80,7 @@ private:
     Renderer();
     ~Renderer() = default;
 
-    void setPixel(const int& x, const int& y, const int& z = 0);
+    void setPixel(const int& x, const int& y, const float& z = 0);
 
     bool cullBackFace(math::Vector v1, math::Vector v2, math::Vector v3);
 
@@ -92,7 +92,7 @@ private:
 
     CullingFace _enable_back_face_culling;
 
-    int* _z_buffer;
+    float* _z_buffer;
 
     TGAImage* _texture;
 

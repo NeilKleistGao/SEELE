@@ -39,9 +39,9 @@ Renderer* Renderer::getInstance() {
     _instance->_width = win->_width; _instance->_height = win->_height;
 
     auto size = _instance->_width * _instance->_height;
-    _instance->_z_buffer = new int[size];
+    _instance->_z_buffer = new float[size];
     for (int i = 0; i < size; ++i) {
-        _instance->_z_buffer[i] = std::numeric_limits<int>::min();
+        _instance->_z_buffer[i] = -1e9;
     }
 
     return _instance;
@@ -62,7 +62,7 @@ void Renderer::clearWithColor(const unsigned char& r, const unsigned char& g, co
         window->_buffer2[(i << 2) | 1] = g;
         window->_buffer2[(i << 2) | 2] = b;
         window->_buffer2[(i << 2) | 3] = 255;
-        _z_buffer[i] = std::numeric_limits<int>::min();
+        _z_buffer[i] = -1e9;
     }
 }
 
@@ -112,7 +112,7 @@ void Renderer::line(const math::Vector& begin, const math::Vector& end) {
     }
     else {
         int p = 2 * dx - dy, ddx = 2 * dx, ds = 2 * (dx - dy);
-        setPixel(begin.x, begin.y);
+        setPixel(begin.x, begin.y, begin.z);
         for (int i = static_cast<int>(begin.y) + 1, j = static_cast<int>(begin.x); i != static_cast<int>(end.y); i += fy) {
             float t = (i - begin.y) / (end.y - begin.y);
             if (p > 0) {
@@ -130,7 +130,7 @@ void Renderer::line(const math::Vector& begin, const math::Vector& end) {
     setPixel(end.x, end.y, end.z);
 }
 
-void Renderer::setPixel(const int& x, const int& y, const int& z) {
+void Renderer::setPixel(const int& x, const int& y, const float& z) {
     auto window = window_manager::Window::getInstance();
     auto camera = Camera::getInstance();
     if (x >= 0 && y >= 0 && x < window->_width && y < window->_height &&

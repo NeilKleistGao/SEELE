@@ -12,9 +12,9 @@
 
 function onLoad()
     model = seele.Model("demo/obj/african_head.obj", "demo/texture/african_head_diffuse.tga")
-    model:setScale(seele.Vector(3, 3, 3))
-    --model:setPosition(seele.Vector(0, 0, -1))
-    --model:setRotation(seele.Vector(3.14 / 8, 3.14 / 8, 3.14 / 16))
+    model:setScale(seele.Vector(2, 2, 2))
+    model:setPosition(seele.Vector(0, 0, -1))
+    model:setRotation(seele.Vector(0, 0, 0))
 end
 
 function onUpdate(delta)

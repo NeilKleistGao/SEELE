@@ -89,9 +89,6 @@ void Model::draw() {
         v1.x *= renderer->getWidth(); v1.y *= renderer->getHeight();
         auto v2 = camera->perspectiveTransform(trans * _vertex[std::get<2>(f)]);
         v2.x *= renderer->getWidth(); v2.y *= renderer->getHeight();
-//        const auto v0 = trans * _vertex[std::get<0>(f)] * 100 + math::Vector{renderer->getWidth() / 2, renderer->getHeight() / 2};
-//        const auto v1 = trans * _vertex[std::get<1>(f)] * 100 + math::Vector{renderer->getWidth() / 2, renderer->getHeight() / 2};
-//        const auto v2 = trans * _vertex[std::get<2>(f)] * 100 + math::Vector{renderer->getWidth() / 2, renderer->getHeight() / 2};
         const auto tv0 = _text_coord[std::get<0>(ti)];
         const auto tv1 = _text_coord[std::get<1>(ti)];
         const auto tv2 = _text_coord[std::get<2>(ti)];
@@ -172,19 +169,18 @@ void Model::loadTexture(const std::string& texture) {
 }
 
 math::Matrix Model::MVTransform() {
-    auto renderer = rendering::Renderer::getInstance();
     auto camera = rendering::Camera::getInstance();
 
     math::Matrix trans{};
     /// model
-    trans.scale(_scale).move(_position)
+    trans.scale(_scale)
             .rotate(math::Vector::X, _rotation.x)
             .rotate(math::Vector::Y, _rotation.y)
-            .rotate(math::Vector::Z, _rotation.z);
+            .rotate(math::Vector::Z, _rotation.z)
+            .move(_position);
     /// view
     auto cr = camera->getRotation();
     trans.move(camera->getPosition())
-//         .move(math::Vector{renderer->getWidth() / 2, renderer->getHeight() / 2})
          .rotate(math::Vector::X, -cr.x)
          .rotate(math::Vector::Y, -cr.y)
          .rotate(math::Vector::Z, -cr.z);
