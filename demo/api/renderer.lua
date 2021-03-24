@@ -33,3 +33,7 @@ end
 Renderer.setCullingFace = function(face)
     Renderer.__instance:setCullingFace(face)
 end
+
+Renderer.setFreeze = function(freeze)
+    Renderer.__instance:setFreeze(freeze)
+end

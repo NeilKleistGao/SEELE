@@ -13,6 +13,8 @@
 #ifndef SEELE_VECTOR_H
 #define SEELE_VECTOR_H
 
+#include <cmath>
+
 #include "utils/registration.h"
 
 namespace math {
@@ -66,7 +68,19 @@ public:
         return x * other.x + y * other.y + z * other.z + w * other.w;
     }
 
+    inline bool operator == (const Vector& other) const {
+        return std::abs(x - other.x) < EPSILON &&
+               std::abs(y - other.y) < EPSILON &&
+               std::abs(z - other.z) < EPSILON &&
+               std::abs(w - other.w) < EPSILON;
+    }
+
+    inline bool operator != (const Vector& other) const {
+        return !(*this == other);
+    }
+
 private:
+    static constexpr float EPSILON = 1e-12;
 };
 
 inline Vector operator* (const float& f, const Vector& v) {

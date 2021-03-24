@@ -73,4 +73,29 @@ Matrix& Matrix::scale(const Vector& scl) {
     return (*this)*=m;
 }
 
+Matrix& Matrix::rotate(const Vector& axis, const float& angle) {
+    Matrix m{};
+    float s = std::sin(angle), c = std::cos(angle);
+
+    if (axis == Vector::X) {
+        m._mat[5] = m._mat[10] = c;
+        m._mat[6] = -s; m._mat[9] = s;
+    }
+    else if (axis == Vector::Y) {
+        m._mat[0] = m._mat[10] = c;
+        m._mat[8] = -s; m._mat[2] = s;
+    }
+    else if (axis == Vector::Z) {
+        m._mat[0] = m._mat[5] = c;
+        m._mat[1] = -s; m._mat[4] = s;
+    }
+    else {
+        utils::Debug::logErr("invalid rotating axis!");
+        return *this;
+    }
+
+    std::swap(m, *this);
+    return (*this)*=m;
+}
+
 } // namespace math

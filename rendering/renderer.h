@@ -66,6 +66,14 @@ public:
         _texture = texture;
     }
 
+    inline void setFreeze(const bool& f) {
+        _freeze = f;
+    }
+
+    inline bool isFreeze() const {
+        return _freeze;
+    }
+
 private:
     using Debug = utils::Debug;
 
@@ -88,6 +96,8 @@ private:
 
     TGAImage* _texture;
 
+    bool _freeze;
+
     static constexpr float EPSILON = 1e-8;
 };
 
@@ -102,6 +112,7 @@ SEELE_REGISTRATION(Renderer) {
                 .addFunction("triangle", &Renderer::triangle)
                 .addFunction("flush", &Renderer::flush)
                 .addFunction("setCullingFace", &Renderer::setCullingFace)
+                .addFunction("setFreeze", &Renderer::setFreeze)
             .endClass()
         .endNamespace();
 }

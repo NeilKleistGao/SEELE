@@ -43,6 +43,7 @@ public:
 
     Matrix& move(const Vector& fwd);
     Matrix& scale(const Vector& scl);
+    Matrix& rotate(const Vector& axis, const float& angle);
 
 private:
     static constexpr size_t WIDTH = 4;

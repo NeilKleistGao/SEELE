@@ -15,6 +15,7 @@
 
 #include "math/vector.h"
 #include "utils/debug.h"
+#include "utils/registration.h"
 
 namespace rendering {
 
@@ -22,9 +23,36 @@ class Camera {
 public:
     static Camera* getInstance();
 
-    inline math::Vector getPosition() {
-        return math::Vector{512, 384, 10, 1}; // TODO:
+    inline math::Vector getPosition() const {
+        return _position;
     }
+
+    inline math::Vector getRotation() const {
+        return _rotation;
+    }
+
+    inline void setPosition(const math::Vector& pos) {
+        _position = pos;
+    }
+
+    inline void setRotation(const math::Vector& dir) {
+        _rotation = dir;
+    }
+
+    inline float getZNear() const {
+        return _z_near;
+    }
+
+    inline float getZFar() const {
+        return _z_far;
+    }
+
+    inline float getFieldOfViewAngle() const {
+        return _fov_angle;
+    }
+
+    math::Vector perspectiveTransform(const math::Vector& v);
+
 private:
     using Debug = utils::Debug;
 
@@ -32,6 +60,13 @@ private:
     ~Camera();
 
     static Camera* _instance;
+
+    math::Vector _position;
+    math::Vector _rotation;
+    math::Vector _camera_size;
+
+    float _z_near, _z_far;
+    float _fov_angle;
 };
 
 } // namespace rendering

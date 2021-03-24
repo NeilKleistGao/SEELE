@@ -18,6 +18,7 @@
 #include <tuple>
 
 #include "math/vector.h"
+#include "math/matrix.h"
 #include "utils/registration.h"
 #include "tga/tgaimage.h"
 
@@ -36,11 +37,17 @@ public:
     inline void setScale(const math::Vector& scale) {
         _scale = scale;
     }
+
+    inline void setRotation(const math::Vector& rotation) {
+        _rotation = rotation;
+    }
 private:
     using t_face = std::tuple<int, int, int>;
     using q_face = std::tuple<int, int, int>;
 
     void processData(const std::string& cmd, const std::string& data);
+
+    math::Matrix MVTransform();
 
     template<typename T>
     T fromString(std::string&& str) {
@@ -60,6 +67,7 @@ private:
 
     math::Vector _position;
     math::Vector _scale;
+    math::Vector _rotation;
 
     TGAImage* _texture;
 };
@@ -72,6 +80,7 @@ SEELE_REGISTRATION(Model) {
                 .addFunction("draw", &Model::draw)
                 .addFunction("setPosition", &Model::setPosition)
                 .addFunction("setScale", &Model::setScale)
+                .addFunction("setRotation", &Model::setRotation)
             .endClass()
         .endNamespace();
 }

@@ -26,6 +26,11 @@ public:
     static void log(T t) {
         std::cout << t << std::endl;
     }
+
+    template<typename T>
+    static void logErr(T t) {
+        std::cerr << t << std::endl;
+    }
 private:
 };
 

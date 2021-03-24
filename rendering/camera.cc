@@ -12,11 +12,18 @@
 
 #include "camera.h"
 
+#include <cmath>
+
+#include "renderer.h"
+
 namespace rendering {
 
 Camera* Camera::_instance = nullptr;
 
-Camera::Camera() {
+Camera::Camera() : _position(0, 0, 0, 1),
+    _rotation(0, 0, 0), _z_near(5), _z_far(-5), _camera_size(8, 6) {
+    auto height = Renderer::getInstance()->getHeight();
+    _fov_angle = std::atan2(height, 5) * 2;
 }
 
 Camera::~Camera() {
@@ -32,6 +39,12 @@ Camera* Camera::getInstance() {
     }
 
     return _instance;
+}
+
+math::Vector Camera::perspectiveTransform(const math::Vector& v) {
+    return math::Vector{(2 * v.x * 5 / (10 - v.z) / _camera_size.x + 0.5f),
+                        (2 * v.y * 5 / (10 - v.z) / _camera_size.y + 0.5f),
+                        v.z, 1};
 }
 
 } // namespace rendering

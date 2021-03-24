@@ -18,11 +18,12 @@
 
 #include "utils/debug.h"
 #include "rendering/renderer.h"
+#include "rendering/camera.h"
 #include "math/matrix.h"
 
 namespace model {
 
-Model::Model(const std::string& filename, const std::string& texture) : _position(), _scale(1, 1, 1) {
+Model::Model(const std::string& filename, const std::string& texture) : _position(), _scale(1, 1, 1), _rotation(0, 0, 0) {
     FILE* fp = fopen(filename.c_str(), "r");
     if (fp == nullptr) {
         utils::Debug::terminate("can't load model " + filename);
@@ -36,7 +37,7 @@ Model::Model(const std::string& filename, const std::string& texture) : _positio
             if (!is_cmd) {
                 is_cmd = true;
                 if (cmd.length() > 1) {
-                    c = fgetc(fp);
+                    fgetc(fp);
                 }
             }
             else {
@@ -75,16 +76,22 @@ Model::Model(const std::string& filename, const std::string& texture) : _positio
 
 void Model::draw() {
     auto renderer = rendering::Renderer::getInstance();
+    auto camera = rendering::Camera::getInstance();
 
-    math::Matrix trans{};
-    trans.scale(_scale).move(_position);
+    math::Matrix trans = MVTransform();
 
     for (int i = 0; i < _faces.size(); ++i) {
         const auto f = _faces[i];
         const auto ti = _text_index[i];
-        const auto v0 = trans * _vertex[std::get<0>(f)];
-        const auto v1 = trans * _vertex[std::get<1>(f)];
-        const auto v2 = trans * _vertex[std::get<2>(f)];
+        auto v0 = camera->perspectiveTransform(trans * _vertex[std::get<0>(f)]);
+        v0.x *= renderer->getWidth(); v0.y *= renderer->getHeight();
+        auto v1 = camera->perspectiveTransform(trans * _vertex[std::get<1>(f)]);
+        v1.x *= renderer->getWidth(); v1.y *= renderer->getHeight();
+        auto v2 = camera->perspectiveTransform(trans * _vertex[std::get<2>(f)]);
+        v2.x *= renderer->getWidth(); v2.y *= renderer->getHeight();
+//        const auto v0 = trans * _vertex[std::get<0>(f)] * 100 + math::Vector{renderer->getWidth() / 2, renderer->getHeight() / 2};
+//        const auto v1 = trans * _vertex[std::get<1>(f)] * 100 + math::Vector{renderer->getWidth() / 2, renderer->getHeight() / 2};
+//        const auto v2 = trans * _vertex[std::get<2>(f)] * 100 + math::Vector{renderer->getWidth() / 2, renderer->getHeight() / 2};
         const auto tv0 = _text_coord[std::get<0>(ti)];
         const auto tv1 = _text_coord[std::get<1>(ti)];
         const auto tv2 = _text_coord[std::get<2>(ti)];
@@ -162,6 +169,27 @@ void Model::loadTexture(const std::string& texture) {
     }
 
     rendering::Renderer::getInstance()->bindTexture(_texture);
+}
+
+math::Matrix Model::MVTransform() {
+    auto renderer = rendering::Renderer::getInstance();
+    auto camera = rendering::Camera::getInstance();
+
+    math::Matrix trans{};
+    /// model
+    trans.scale(_scale).move(_position)
+            .rotate(math::Vector::X, _rotation.x)
+            .rotate(math::Vector::Y, _rotation.y)
+            .rotate(math::Vector::Z, _rotation.z);
+    /// view
+    auto cr = camera->getRotation();
+    trans.move(camera->getPosition())
+//         .move(math::Vector{renderer->getWidth() / 2, renderer->getHeight() / 2})
+         .rotate(math::Vector::X, -cr.x)
+         .rotate(math::Vector::Y, -cr.y)
+         .rotate(math::Vector::Z, -cr.z);
+
+    return trans;
 }
 
 } // namespace model

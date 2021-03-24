@@ -40,6 +40,7 @@ void Window::destroyInstance() {
 
 void Window::render() {
     _timer = std::chrono::system_clock::now();
+    auto renderer = rendering::Renderer::getInstance();
 
     while (!_closing) {
         time_type now = std::chrono::system_clock::now();
@@ -50,8 +51,10 @@ void Window::render() {
             duration = 0.033;
         }
 
-        _draw_func(duration);
-        display();
+        if (!renderer->isFreeze()) {
+            _draw_func(duration);
+            display();
+        }
 
         pollEvent();
     }

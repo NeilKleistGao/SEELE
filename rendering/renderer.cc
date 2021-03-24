@@ -24,7 +24,7 @@ Renderer* Renderer::_instance = nullptr;
 
 Renderer::Renderer() : _r{255}, _g(255), _b(255), _a(255),
                         _enable_back_face_culling(CullingFace::NONE),
-                        _z_buffer(nullptr), _texture(nullptr) {
+                        _z_buffer(nullptr), _texture(nullptr), _freeze(false) {
 }
 
 Renderer* Renderer::getInstance() {
@@ -132,7 +132,9 @@ void Renderer::line(const math::Vector& begin, const math::Vector& end) {
 
 void Renderer::setPixel(const int& x, const int& y, const int& z) {
     auto window = window_manager::Window::getInstance();
-    if (x >= 0 && y >= 0 && x < window->_width && y < window->_height && _z_buffer[y * _width + x] <= z) {
+    auto camera = Camera::getInstance();
+    if (x >= 0 && y >= 0 && x < window->_width && y < window->_height &&
+        _z_buffer[y * _width + x] <= z/** && z >= camera->getZNear() && z <= camera->getZFar() **/) {
         window->_buffer2[((_width * y + x) << 2) | 0] = _r;
         window->_buffer2[((_width * y + x) << 2) | 1] = _g;
         window->_buffer2[((_width * y + x) << 2) | 2] = _b;
@@ -207,11 +209,12 @@ bool Renderer::cullBackFace(math::Vector v1, math::Vector v2, math::Vector v3) {
         return false;
     }
 
-    auto e1 = v1 - v2, e2 = v2 - v3;
-    auto norm = e1 ^ e2;
-    auto dot = norm * Camera::getInstance()->getPosition();
-    return (dot >= 0 && _enable_back_face_culling == CullingFace::BACK_FACE) ||
-    (dot <= 0 && _enable_back_face_culling == CullingFace::FRONT_FACE);
+//    auto e1 = v1 - v2, e2 = v2 - v3;
+//    auto norm = e1 ^ e2;
+//    auto dot = norm * Camera::getInstance()->getPosition();
+//    return (dot >= 0 && _enable_back_face_culling == CullingFace::BACK_FACE) ||
+//    (dot <= 0 && _enable_back_face_culling == CullingFace::FRONT_FACE);
+    // TODO: failed
 }
 
 void Renderer::triangleWithTexture(math::Vector v1, math::Vector v2, math::Vector v3,
