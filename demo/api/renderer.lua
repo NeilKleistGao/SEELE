@@ -37,3 +37,11 @@ end
 Renderer.setFreeze = function(freeze)
     Renderer.__instance:setFreeze(freeze)
 end
+
+Renderer.getColor = function()
+    return Renderer.__instance:getColor()
+end
+
+Renderer.getTexturePixel = function(x, y)
+    return Renderer.__instance:getTexturePixel(x, y)
+end

@@ -72,130 +72,112 @@ void Renderer::line(const math::Vector& begin, const math::Vector& end) {
     int fx = (end.x > begin.x) ? 1 : -1, fy = (end.y > begin.y) ? 1 : -1;
 
     if (dx == 0 && dy == 0) {
-        setPixel(begin.x, begin.y, begin.z);
+        setPixel(begin.x, begin.y, begin.z, getColor());
         return;
     }
     else if (dx == 0) {
         for (int i = static_cast<int>(begin.y); i != static_cast<int>(end.y); i += fy) {
             float t = (i - begin.y) / (end.y - begin.y);
-            setPixel(begin.x, i, (1 - t) * begin.z + t * end.z);
+            setPixel(begin.x, i, (1 - t) * begin.z + t * end.z, getColor());
         }
     }
     else if (dy == 0) {
         for (int i = static_cast<int>(begin.x); i != static_cast<int>(end.x); i += fx) {
             float t = (i - begin.x) / (end.x - begin.x);
-            setPixel(i, begin.y, (1 - t) * begin.z + t * end.z);
+            setPixel(i, begin.y, (1 - t) * begin.z + t * end.z, getColor());
         }
     }
     else if (dx == dy) {
         for (int i = static_cast<int>(begin.x), j = static_cast<int>(begin.y);
             i != static_cast<int>(end.x); i += fx, j += fy) {
             float t = (i - begin.x) / (end.x - begin.x);
-            setPixel(i, j, (1 - t) * begin.z + t * end.z);
+            setPixel(i, j, (1 - t) * begin.z + t * end.z, getColor());
         }
     }
     else if (dx > dy) {
         int p = 2 * dy - dx, ddy = 2 * dy, ds = 2 * (dy - dx);
-        setPixel(begin.x, begin.y, begin.z);
+        setPixel(begin.x, begin.y, begin.z, getColor());
         for (int i = static_cast<int>(begin.x) + 1, j = static_cast<int>(begin.y); i != static_cast<int>(end.x); i += fx) {
             float t = (i - begin.x) / (end.x - begin.x);
             if (p < 0) {
-                setPixel(i, j, (1 - t) * begin.z + t * end.z);
+                setPixel(i, j, (1 - t) * begin.z + t * end.z, getColor());
                 p += ddy;
             }
             else {
                 j += fy;
-                setPixel(i, j, (1 - t) * begin.z + t * end.z);
+                setPixel(i, j, (1 - t) * begin.z + t * end.z, getColor());
                 p += ds;
             }
         }
     }
     else {
         int p = 2 * dx - dy, ddx = 2 * dx, ds = 2 * (dx - dy);
-        setPixel(begin.x, begin.y, begin.z);
+        setPixel(begin.x, begin.y, begin.z, getColor());
         for (int i = static_cast<int>(begin.y) + 1, j = static_cast<int>(begin.x); i != static_cast<int>(end.y); i += fy) {
             float t = (i - begin.y) / (end.y - begin.y);
             if (p > 0) {
-                setPixel(j, i, (1 - t) * begin.z + t * end.z);
+                setPixel(j, i, (1 - t) * begin.z + t * end.z, getColor());
                 p += ddx;
             }
             else {
                 j += fx;
-                setPixel(j, i, (1 - t) * begin.z + t * end.z);
+                setPixel(j, i, (1 - t) * begin.z + t * end.z, getColor());
                 p += ds;
             }
         }
     }
 
-    setPixel(end.x, end.y, end.z);
+    setPixel(end.x, end.y, end.z, getColor());
 }
 
-void Renderer::setPixel(const int& x, const int& y, const float& z) {
+void Renderer::setPixel(const int& x, const int& y, const float& z, const math::Vector& pixel) {
     auto window = window_manager::Window::getInstance();
     auto camera = Camera::getInstance();
     if (x >= 0 && y >= 0 && x < window->_width && y < window->_height &&
         _z_buffer[y * _width + x] <= z/** && z >= camera->getZNear() && z <= camera->getZFar() **/) {
-        window->_buffer2[((_width * y + x) << 2) | 0] = _r;
-        window->_buffer2[((_width * y + x) << 2) | 1] = _g;
-        window->_buffer2[((_width * y + x) << 2) | 2] = _b;
-        window->_buffer2[((_width * y + x) << 2) | 3] = _a;
+        window->_buffer2[((_width * y + x) << 2) | 0] = pixel.x;
+        window->_buffer2[((_width * y + x) << 2) | 1] = pixel.y;
+        window->_buffer2[((_width * y + x) << 2) | 2] = pixel.z;
+        window->_buffer2[((_width * y + x) << 2) | 3] = pixel.w;
         _z_buffer[y * _width + x] = z;
     }
 }
 
-void Renderer::triangle(math::Vector v1, math::Vector v2, math::Vector v3) {
-    if (cullBackFace(v1, v2, v3)) {
-        return;
-    }
+void Renderer::triangle(math::Vector v1, math::Vector v2, math::Vector v3,
+                        math::Vector tv1, math::Vector tv2, math::Vector tv3) {
+//    if (cullBackFace(v1, v2, v3)) {
+//        return;
+//    }
 
-    auto e = v1 - v2;
-    if (std::abs(e.x * v3.y - e.y * v3.x) < EPSILON) {
-        this->line(v1, v2); this->line(v2, v3);
-        return;
-    }
+    auto rs = script::RenderingScript::getInstance();
+    rs->call("onVertex", v1, tv1);
+    v1 = rs->getGlobalVariable<math::Vector>("out_position"); tv1 = rs->getGlobalVariable<math::Vector>("out_tex_coord");
+    rs->call("onVertex", v2, tv2);
+    v2 = rs->getGlobalVariable<math::Vector>("out_position"); tv2 = rs->getGlobalVariable<math::Vector>("out_tex_coord");
+    rs->call("onVertex", v3, tv3);
+    v3 = rs->getGlobalVariable<math::Vector>("out_position"); tv3 = rs->getGlobalVariable<math::Vector>("out_tex_coord");
 
-    if (v1.y > v2.y) {
-        std::swap(v1, v2);
-    }
-    if (v1.y > v3.y) {
-        std::swap(v1, v3);
-    }
-    if (v2.y > v3.y) {
-        std::swap(v2, v3);
-    }
+    int min_x = std::min(std::min(v1.x, v2.x), v3.x), max_x = std::max(std::max(v1.x, v2.x), v3.x),
+        min_y = std::min(std::min(v1.y, v2.y), v3.y), max_y = std::max(std::max(v1.y, v2.y), v3.y);
 
-    float height = v3.y - v1.y, sub_height = v2.y - v1.y + 1;
-    auto inc1 = (v3.x - v1.x) * (1.0f / height), inc2 = (v2.x - v1.x) * (1.0f / sub_height);
-    auto sd1 = v1, sd2 = v1;
-    for (int i = static_cast<int>(v1.y); i <= static_cast<int>(v2.y); ++i) {
-        sd1.y = sd2.y = i;
-        int min = std::min(sd1.x, sd2.x), max = std::max(sd1.x, sd2.x);
-        for (int j = min; j <= max; ++j) {
-            float u = ((j - v1.x) * (v2.y - v1.y) - (i - v1.y) * (v3.x - v1.x))
-                    / ((v2.x - v1.x) * (v3.y - v1.y) - (v2.y - v1.y) * (v3.x - v1.x)),
-                  v = ((j - v1.x) * (v2.y - v1.y) - (i - v1.y) * (v2.x - v1.x))
-                    / ((v3.x - v1.x) * (v2.y - v1.y) - (v3.y - v1.y) * (v2.x - v1.x)),
-                  w = 1 - u - v;
-            setPixel(j, i, v1.z * w + v2.z * u + v3.z * v);
+    for (int i = min_x; i <= max_x; ++i) {
+        for (int j = min_y; j <= max_y; ++j) {
+            auto temp = math::Vector{i, j, 0, 0};
+            auto e1 = v1 - temp, e2 = v2 - temp, e3 = v3 - temp;
+
+            auto r1 = e1.x * e2.y - e1.y * e2.x,
+                 r2 = e2.x * e3.y - e2.y * e3.x,
+                 r3 = e3.x * e1.y - e3.y * e1.x;
+            if ((r1 >= -EPSILON && r2 >= -EPSILON && r3 >= -EPSILON) || (r1 <= EPSILON && r2 <= EPSILON && r3 <= EPSILON)) {
+                float u = (-(i - v2.x) * (v3.y - v2.y) + (j - v2.y) * (v3.x - v2.x))
+                          / (-(v1.x - v2.x) * (v3.y - v2.y) + (v1.y - v2.y) * (v3.x - v2.x)),
+                        v = (-(i - v3.x) * (v1.y - v3.y) + (j - v3.y) * (v1.x - v3.x))
+                            / (-(v2.x - v3.x) * (v1.y - v3.y) + (v2.y - v3.y) * (v1.x - v3.x)),
+                        w = 1 - u - v;
+                rasterize(math::Vector{i, j, v1.z * w + v2.z * u + v3.z * v},
+                          tv1 * u + tv2 * v + tv3 * w);
+            }
         }
-        sd1.x += inc1; sd2.x += inc2;
-    }
-
-    sub_height = v3.y - v2.y + 1;
-    inc2 = (v3.x - v2.x) * (1.0f / sub_height);
-    sd2 = v2;
-    for (int i = static_cast<int>(v2.y); i <= static_cast<int>(v3.y); ++i) {
-        sd1.y = sd2.y = i;
-        int min = std::min(sd1.x, sd2.x), max = std::max(sd1.x, sd2.x);
-        for (int j = min; j <= max; ++j) {
-            float u = ((j - v1.x) * (v2.y - v1.y) - (i - v1.y) * (v3.x - v1.x))
-                      / ((v2.x - v1.x) * (v3.y - v1.y) - (v2.y - v1.y) * (v3.x - v1.x)),
-                    v = ((j - v1.x) * (v2.y - v1.y) - (i - v1.y) * (v2.x - v1.x))
-                        / ((v3.x - v1.x) * (v2.y - v1.y) - (v3.y - v1.y) * (v2.x - v1.x)),
-                    w = 1 - u - v;
-            setPixel(j, i, v1.z * w + v2.z * u + v3.z * v);
-        }
-        sd1.x += inc1; sd2.x += inc2;
     }
 }
 
@@ -217,68 +199,21 @@ bool Renderer::cullBackFace(math::Vector v1, math::Vector v2, math::Vector v3) {
     // TODO: failed
 }
 
-void Renderer::triangleWithTexture(math::Vector v1, math::Vector v2, math::Vector v3,
-                             const math::Vector& tv1, const math::Vector& tv2, const math::Vector& tv3) {
-    if (cullBackFace(v1, v2, v3) || _texture == nullptr) {
-        return;
+void Renderer::rasterize(const math::Vector& v, const math::Vector& tv) {
+    auto rs = script::RenderingScript::getInstance();
+    rs->call("onFragment", tv);
+    auto color = rs->getGlobalVariable<math::Vector>("out_pixel");
+    setPixel(static_cast<int>(std::round(v.x)), static_cast<int>(std::round(v.y)), v.z, color);
+}
+
+math::Vector Renderer::getTexturePixel(const float& x, const float& y) {
+    if (_texture == nullptr) {
+        return math::Vector{};
     }
 
-    auto e = v1 - v2;
-    if (std::abs(e.x * v3.y - e.y * v3.x) < EPSILON) {
-        this->line(v1, v2); this->line(v2, v3);
-        return;
-    }
-
-    if (v1.y > v2.y) {
-        std::swap(v1, v2);
-    }
-    if (v1.y > v3.y) {
-        std::swap(v1, v3);
-    }
-    if (v2.y > v3.y) {
-        std::swap(v2, v3);
-    }
-
-    float height = v3.y - v1.y, sub_height = v2.y - v1.y + 1;
-    auto inc1 = (v3.x - v1.x) * (1.0f / height), inc2 = (v2.x - v1.x) * (1.0f / sub_height);
-    auto sd1 = v1, sd2 = v1;
-    auto texture_size = math::Vector{_texture->get_width(), _texture->get_height(), 0};
-    for (int i = std::round(v1.y); i <= std::round(v2.y); ++i) {
-        sd1.y = sd2.y = i;
-        int min = std::min(std::round(sd1.x), std::round(sd2.x)), max = std::max(std::round(sd1.x), std::round(sd2.x));
-        for (int j = min; j <= max; ++j) {
-            float u = (-(j - v2.x) * (v3.y - v2.y) + (i - v2.y) * (v3.x - v2.x))
-                      / (-(v1.x - v2.x) * (v3.y - v2.y) + (v1.y - v2.y) * (v3.x - v2.x)),
-                    v = (-(j - v3.x) * (v1.y - v3.y) + (i - v3.y) * (v1.x - v3.x))
-                        / (-(v2.x - v3.x) * (v1.y - v3.y) + (v2.y - v3.y) * (v1.x - v3.x)),
-                    w = 1 - u - v;
-            auto tv = tv1 * u + tv2 * v + tv3 * w;
-            auto color = _texture->get(texture_size.x * tv.x, texture_size.y * tv.y);
-            setColor(color.r, color.g, color.b, color.a);
-            setPixel(j, i, v1.z * u + v2.z * v + v3.z * w);
-        }
-        sd1.x += inc1; sd2.x += inc2;
-    }
-
-    sub_height = v3.y - v2.y + 1;
-    inc2 = (v3.x - v2.x) * (1.0f / sub_height);
-    sd2 = v2;
-    for (int i = std::round(v2.y); i <= std::round(v3.y); ++i) {
-        sd1.y = sd2.y = i;
-        int min = std::min(std::round(sd1.x), std::round(sd2.x)), max = std::max(std::round(sd1.x), std::round(sd2.x));
-        for (int j = min; j <= max; ++j) {
-            float u = (-(j - v2.x) * (v3.y - v2.y) + (i - v2.y) * (v3.x - v2.x))
-                      / (-(v1.x - v2.x) * (v3.y - v2.y) + (v1.y - v2.y) * (v3.x - v2.x)),
-                    v = (-(j - v3.x) * (v1.y - v3.y) + (i - v3.y) * (v1.x - v3.x))
-                        / (-(v2.x - v3.x) * (v1.y - v3.y) + (v2.y - v3.y) * (v1.x - v3.x)),
-                    w = 1 - u - v;
-            auto tv = tv1 * u + tv2 * v + tv3 * w;
-            auto color = _texture->get(texture_size.x * tv.x, texture_size.y * tv.y);
-            setColor(color.r, color.g, color.b, color.a);
-            setPixel(j, i, v1.z * u + v2.z * v + v3.z * w);
-        }
-        sd1.x += inc1; sd2.x += inc2;
-    }
+    auto width = _texture->get_width(), height = _texture->get_height();
+    auto color = _texture->get(static_cast<int>(std::round(x * width)), static_cast<int>(std::round(y * height)));
+    return math::Vector{color.r, color.g, color.b, color.a};
 }
 
 } // namespace rendering

@@ -15,10 +15,8 @@
 
 #include <filesystem>
 
-#include "lua/lua.hpp"
-#include "LuaBridge/LuaBridge.h"
-
 #include "utils/debug.h"
+#include "script_manager.h"
 
 namespace script {
 
@@ -31,8 +29,35 @@ public:
     void load(const std::string& filename);
     void update(const float& delta);
 
-    inline lua_State* getState() {
-        return _state;
+    template<typename T>
+    T getGlobalVariable(const std::string& name) {
+        luabridge::LuaRef ref = luabridge::getGlobal(ScriptManager::getInstance()->getState(), name.c_str());
+        if (ref.isNil()) {
+            return T();
+        }
+        else {
+            return ref.cast<T>();
+        }
+    }
+
+    template <typename T>
+    void call(const std::string& name, const T& v) {
+        luabridge::LuaRef ref = luabridge::getGlobal(ScriptManager::getInstance()->getState(), name.c_str());
+        if (!ref.isFunction()) {
+            return;
+        }
+
+        ref(v);
+    }
+
+    template <typename T, typename P>
+    void call(const std::string& name, const T& v1, const P& v2) {
+        luabridge::LuaRef ref = luabridge::getGlobal(ScriptManager::getInstance()->getState(), name.c_str());
+        if (!ref.isFunction()) {
+            return;
+        }
+
+        ref(v1, v2);
     }
 private:
     using Debug = utils::Debug;
@@ -41,7 +66,6 @@ private:
     ~RenderingScript();
 
     static RenderingScript* _instance;
-    lua_State* _state;
 };
 
 } // namespace script

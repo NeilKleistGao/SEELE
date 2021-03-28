@@ -88,15 +88,16 @@ inline Vector operator* (const float& f, const Vector& v) {
 }
 
 SEELE_REGISTRATION(Vector) {
-    luabridge::getGlobalNamespace(script::RenderingScript::getInstance()->getState())
-        .beginNamespace("seele")
+    luabridge::getGlobalNamespace(script::ScriptManager::getInstance()->getState())
+            .beginNamespace("seele")
             .beginClass<Vector>("Vector")
-                .addProperty("x", &Vector::x, true)
-                .addProperty("y", &Vector::y, true)
-                .addProperty("z", &Vector::z, true)
-                .addConstructor<void (*) (const float &, const float &, const float &)>()
-            .endClass()
-        .endNamespace();
+            .addProperty("x", &Vector::x, true)
+            .addProperty("y", &Vector::y, true)
+            .addProperty("z", &Vector::z, true)
+            .addProperty("w", &Vector::w, true)
+            .addConstructor<void (*) (const float &, const float &, const float &, const float &)>()
+    .endClass()
+    .endNamespace();
 }
 
 } // namespace math

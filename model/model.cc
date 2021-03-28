@@ -93,7 +93,7 @@ void Model::draw() {
         const auto tv1 = _text_coord[std::get<1>(ti)];
         const auto tv2 = _text_coord[std::get<2>(ti)];
 
-        renderer->triangleWithTexture(v0, v1, v2, tv0, tv1, tv2);
+        renderer->triangle(v0, v1, v2, tv0, tv1, tv2);
     }
 }
 

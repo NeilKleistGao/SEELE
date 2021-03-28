@@ -36,7 +36,7 @@ void RenderingScript::destroyInstance() {
 void RenderingScript::preload(const std::filesystem::path& path) {
     std::filesystem::directory_iterator dit{path};
     for (const auto& it : dit) {
-        auto res = luaL_dofile(_state, it.path().c_str());
+        auto res = luaL_dofile(ScriptManager::getInstance()->getState(), it.path().c_str());
         if (res) {
             Debug::terminate("preloading api failed!");
         }
@@ -44,35 +44,25 @@ void RenderingScript::preload(const std::filesystem::path& path) {
 }
 
 void RenderingScript::load(const std::string& filename) {
-    auto res = luaL_dofile(_state, filename.c_str());
+    auto res = luaL_dofile(ScriptManager::getInstance()->getState(), filename.c_str());
     if (res) {
-        Debug::terminate("preloading api failed!");
+        Debug::terminate("loading script failed!");
     }
 
-    luabridge::LuaRef on_load = luabridge::getGlobal(_state, "onLoad");
+    luabridge::LuaRef on_load = luabridge::getGlobal(ScriptManager::getInstance()->getState(), "onLoad");
     if (on_load.isFunction()) {
         on_load();
     }
 }
 
 void RenderingScript::update(const float& delta) {
-    luabridge::LuaRef on_update = luabridge::getGlobal(_state, "onUpdate");
+    luabridge::LuaRef on_update = luabridge::getGlobal(ScriptManager::getInstance()->getState(), "onUpdate");
     if (on_update.isFunction()) {
         on_update(delta);
     }
 }
 
-RenderingScript::RenderingScript() : _state(nullptr) {
-    _state = luaL_newstate();
-    luaL_openlibs(_state);
-
-}
-
-RenderingScript::~RenderingScript() {
-    if (_state != nullptr) {
-        lua_close(_state);
-        _state = nullptr;
-    }
-}
+RenderingScript::RenderingScript() = default;
+RenderingScript::~RenderingScript() = default;
 
 } // namespace script

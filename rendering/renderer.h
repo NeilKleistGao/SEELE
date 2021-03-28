@@ -13,7 +13,7 @@
 #ifndef SEELE_RENDERER_H
 #define SEELE_RENDERER_H
 
-#include <list>
+#include <vector>
 #include <array>
 
 #include "utils/debug.h"
@@ -35,12 +35,14 @@ public:
         _r = r; _g = g; _b = b; _a = a;
     }
 
+    inline math::Vector getColor() const {
+        return math::Vector{_r, _g, _b, _a};
+    }
+
     void line(const math::Vector& begin, const math::Vector& end);
 
-    void triangle(math::Vector v1, math::Vector v2, math::Vector v3);
-
-    void triangleWithTexture(math::Vector v1, math::Vector v2, math::Vector v3,
-                             const math::Vector& tv1, const math::Vector& tv2, const math::Vector& tv3);
+    void triangle(math::Vector v1, math::Vector v2, math::Vector v3,
+                  math::Vector tv1, math::Vector tv2, math::Vector tv3);
 
     inline size_t getWidth() const {
         return _width;
@@ -74,15 +76,19 @@ public:
         return _freeze;
     }
 
+    math::Vector getTexturePixel(const float& x, const float& y);
+
 private:
     using Debug = utils::Debug;
 
     Renderer();
     ~Renderer() = default;
 
-    void setPixel(const int& x, const int& y, const float& z = 0);
+    void setPixel(const int& x, const int& y, const float& z, const math::Vector& pixel);
 
     bool cullBackFace(math::Vector v1, math::Vector v2, math::Vector v3);
+
+    void rasterize(const math::Vector& v, const math::Vector& tv);
 
     static Renderer* _instance;
 
@@ -102,7 +108,7 @@ private:
 };
 
 SEELE_REGISTRATION(Renderer) {
-    luabridge::getGlobalNamespace(script::RenderingScript::getInstance()->getState())
+    luabridge::getGlobalNamespace(script::ScriptManager::getInstance()->getState())
         .beginNamespace("seele")
             .beginClass<Renderer>("Renderer")
                 .addStaticFunction("getInstance", &Renderer::getInstance)
@@ -113,6 +119,8 @@ SEELE_REGISTRATION(Renderer) {
                 .addFunction("flush", &Renderer::flush)
                 .addFunction("setCullingFace", &Renderer::setCullingFace)
                 .addFunction("setFreeze", &Renderer::setFreeze)
+                .addFunction("getColor", &Renderer::getColor)
+                .addFunction("getTexturePixel", &Renderer::getTexturePixel)
             .endClass()
         .endNamespace();
 }

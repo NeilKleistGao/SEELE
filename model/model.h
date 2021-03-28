@@ -16,10 +16,12 @@
 #include <string>
 #include <vector>
 #include <tuple>
+#include <sstream>
 
 #include "math/vector.h"
 #include "math/matrix.h"
 #include "utils/registration.h"
+#include "script/rendering_script.h"
 #include "tga/tgaimage.h"
 
 namespace model {
@@ -73,7 +75,7 @@ private:
 };
 
 SEELE_REGISTRATION(Model) {
-    luabridge::getGlobalNamespace(script::RenderingScript::getInstance()->getState())
+    luabridge::getGlobalNamespace(script::ScriptManager::getInstance()->getState())
         .beginNamespace("seele")
             .beginClass<Model>("Model")
                 .addConstructor<void (*) (const std::string&, const std::string&)>()

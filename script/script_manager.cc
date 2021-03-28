@@ -8,36 +8,43 @@
  * it applies also to any other work released this way by its authors. You can apply it to your programs, too.
  */
 
-/// @file vector.h
+/// @file script_manager.cc
 
-#include "vector.h"
+#include "script_manager.h"
 
+#include "utils/debug.h"
 
-namespace math {
+namespace script {
+ScriptManager* ScriptManager::_instance = nullptr;
 
-const Vector Vector::X = Vector{1, 0, 0, 0};
-const Vector Vector::Y = Vector{0,1, 0, 0};
-const Vector Vector::Z = Vector{0, 0, 1, 0};
+ScriptManager* ScriptManager::getInstance() {
+    if (_instance == nullptr) {
+        _instance = new(std::nothrow) ScriptManager();
+        if (_instance == nullptr) {
+            utils::Debug::terminate("can't create script manager!");
+        }
+    }
 
-Vector::Vector(const float& x, const float& y, const float& z, const float& w) : x(x), y(y), z(z), w(w) {
+    return _instance;
 }
 
-Vector& Vector::operator+= (const Vector& other) {
-    x += other.x; y += other.y; z += other.z; w += other.w;
-    return *this;
+void ScriptManager::destroyInstance() {
+    if (_instance != nullptr) {
+        delete _instance;
+        _instance = nullptr;
+    }
 }
 
-Vector& Vector::operator^= (const Vector& other) {
-    float tx = y * other.z - z * other.y,
-          ty = other.x * z - x * other.z,
-          tz = x * other.y - y * other.z;
-    x = tx, y = ty, z = tz;
-    return *this;
+ScriptManager::ScriptManager() : _state(nullptr) {
+    _state = luaL_newstate();
+    luaL_openlibs(_state);
 }
 
-Vector& Vector::operator*= (const float& f) {
-    x *= f; y *= f; z *= f; w *= f;
-    return *this;
+ScriptManager::~ScriptManager() {
+    if (_state != nullptr) {
+        lua_close(_state);
+        _state = nullptr;
+    }
 }
 
-} // namespace math
+} // namespace script

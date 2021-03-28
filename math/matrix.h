@@ -16,6 +16,7 @@
 #include <array>
 
 #include "vector.h"
+#include "utils/debug.h"
 
 namespace math {
 class Matrix {

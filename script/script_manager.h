@@ -8,36 +8,36 @@
  * it applies also to any other work released this way by its authors. You can apply it to your programs, too.
  */
 
-/// @file vector.h
+/// @file script_manager.h
 
-#include "vector.h"
+#ifndef SEELE_SCRIPT_MANAGER_H
+#define SEELE_SCRIPT_MANAGER_H
+
+#include "utils/registration.h"
+
+namespace script {
+
+class RenderingScirpt;
+
+class ScriptManager {
+public:
+    static ScriptManager* getInstance();
+    static void destroyInstance();
 
 
-namespace math {
+    inline lua_State* getState() {
+        return _state;
+    }
 
-const Vector Vector::X = Vector{1, 0, 0, 0};
-const Vector Vector::Y = Vector{0,1, 0, 0};
-const Vector Vector::Z = Vector{0, 0, 1, 0};
+    friend class RenderingScirpt;
+private:
+    static ScriptManager* _instance;
+    lua_State* _state;
 
-Vector::Vector(const float& x, const float& y, const float& z, const float& w) : x(x), y(y), z(z), w(w) {
-}
+    ScriptManager();
+    ~ScriptManager();
+};
 
-Vector& Vector::operator+= (const Vector& other) {
-    x += other.x; y += other.y; z += other.z; w += other.w;
-    return *this;
-}
+} // namespace script
 
-Vector& Vector::operator^= (const Vector& other) {
-    float tx = y * other.z - z * other.y,
-          ty = other.x * z - x * other.z,
-          tz = x * other.y - y * other.z;
-    x = tx, y = ty, z = tz;
-    return *this;
-}
-
-Vector& Vector::operator*= (const float& f) {
-    x *= f; y *= f; z *= f; w *= f;
-    return *this;
-}
-
-} // namespace math
+#endif //SEELE_SCRIPT_MANAGER_H
