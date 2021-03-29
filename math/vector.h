@@ -65,7 +65,7 @@ public:
     }
 
     inline float operator* (const Vector& other) const {
-        return x * other.x + y * other.y + z * other.z + w * other.w;
+        return x * other.x + y * other.y + z * other.z;
     }
 
     inline bool operator == (const Vector& other) const {
@@ -78,6 +78,14 @@ public:
     inline bool operator != (const Vector& other) const {
         return !(*this == other);
     }
+
+    float getDistance2(const Vector& other);
+
+    inline float getDistance(const Vector& other) {
+        return std::sqrt(getDistance2(other));
+    }
+
+    Vector normalize() const;
 
 private:
     static constexpr float EPSILON = 1e-12;

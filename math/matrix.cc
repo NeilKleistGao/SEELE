@@ -61,14 +61,14 @@ Vector Matrix::operator* (const Vector& v) {
 
 Matrix& Matrix::move(const Vector& fwd) {
     Matrix m{};
-    m._mat[3] = fwd.x; m._mat[7] = fwd.y; m._mat[11] = fwd.z;
+    m._mat[3] += fwd.x; m._mat[7] += fwd.y; m._mat[11] += fwd.z; m._mat[15] = 1;
     std::swap(m, *this);
     return (*this)*=m;
 }
 
 Matrix& Matrix::scale(const Vector& scl) {
     Matrix m{};
-    m._mat[0] = scl.x; m._mat[5] = scl.y; m._mat[10] = scl.z; m._mat[15] = scl.w;
+    m._mat[0] = scl.x; m._mat[5] = scl.y; m._mat[10] = scl.z; m._mat[15] = 1;
     std::swap(m, *this);
     return (*this)*=m;
 }

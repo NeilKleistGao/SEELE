@@ -51,6 +51,10 @@ public:
         return _fov_angle;
     }
 
+    inline math::Vector getCameraSize() const {
+        return _camera_size;
+    }
+
     math::Vector perspectiveTransform(const math::Vector& v);
 
 private:

@@ -18,13 +18,14 @@
 
 #include "window_manager/window_manager.h"
 #include "camera.h"
+#include "light/light_manager.h"
 
 namespace rendering {
 Renderer* Renderer::_instance = nullptr;
 
 Renderer::Renderer() : _r{255}, _g(255), _b(255), _a(255),
                         _enable_back_face_culling(CullingFace::NONE),
-                        _z_buffer(nullptr), _texture(nullptr), _freeze(false) {
+                        _z_buffer(nullptr), _texture(nullptr), _freeze(false), _normal(nullptr) {
 }
 
 Renderer* Renderer::getInstance() {
@@ -144,7 +145,8 @@ void Renderer::setPixel(const int& x, const int& y, const float& z, const math::
 }
 
 void Renderer::triangle(math::Vector v1, math::Vector v2, math::Vector v3,
-                        math::Vector tv1, math::Vector tv2, math::Vector tv3) {
+                        math::Vector tv1, math::Vector tv2, math::Vector tv3,
+                        math::Vector nv1, math::Vector nv2, math::Vector nv3) {
 //    if (cullBackFace(v1, v2, v3)) {
 //        return;
 //    }
@@ -174,8 +176,10 @@ void Renderer::triangle(math::Vector v1, math::Vector v2, math::Vector v3,
                         v = (-(i - v3.x) * (v1.y - v3.y) + (j - v3.y) * (v1.x - v3.x))
                             / (-(v2.x - v3.x) * (v1.y - v3.y) + (v2.y - v3.y) * (v1.x - v3.x)),
                         w = 1 - u - v;
+                auto normal = (nv1 * u + nv2 * v + nv3 * w).normalize();
+                auto coord = tv1 * u + tv2 * v + tv3 * w;
                 rasterize(math::Vector{i, j, v1.z * w + v2.z * u + v3.z * v},
-                          tv1 * u + tv2 * v + tv3 * w);
+                          coord, normal);
             }
         }
     }
@@ -199,10 +203,12 @@ bool Renderer::cullBackFace(math::Vector v1, math::Vector v2, math::Vector v3) {
     // TODO: failed
 }
 
-void Renderer::rasterize(const math::Vector& v, const math::Vector& tv) {
+void Renderer::rasterize(const math::Vector& v, const math::Vector& tv, const math::Vector& n) {
     auto rs = script::RenderingScript::getInstance();
+    auto lm = light::LightManager::getInstance();
     rs->call("onFragment", tv);
     auto color = rs->getGlobalVariable<math::Vector>("out_pixel");
+    color = lm->calculateLight(v, n, color, 0.8f, 1.2f, 0.1f);
     setPixel(static_cast<int>(std::round(v.x)), static_cast<int>(std::round(v.y)), v.z, color);
 }
 
@@ -213,6 +219,16 @@ math::Vector Renderer::getTexturePixel(const float& x, const float& y) {
 
     auto width = _texture->get_width(), height = _texture->get_height();
     auto color = _texture->get(static_cast<int>(std::round(x * width)), static_cast<int>(std::round(y * height)));
+    return math::Vector{color.r, color.g, color.b, color.a};
+}
+
+math::Vector Renderer::getNormalTextureDirection(const float& x, const float& y) {
+    if (_normal == nullptr) {
+        return math::Vector{};
+    }
+
+    auto width = _normal->get_width(), height = _normal->get_height();
+    auto color = _normal->get(static_cast<int>(std::round(x * width)), static_cast<int>(std::round(y * height)));
     return math::Vector{color.r, color.g, color.b, color.a};
 }
 

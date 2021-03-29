@@ -30,14 +30,29 @@ Vector& Vector::operator+= (const Vector& other) {
 Vector& Vector::operator^= (const Vector& other) {
     float tx = y * other.z - z * other.y,
           ty = other.x * z - x * other.z,
-          tz = x * other.y - y * other.z;
-    x = tx, y = ty, z = tz;
+          tz = x * other.y - y * other.x;
+    x = tx, y = ty, z = tz; w = 1;
     return *this;
 }
 
 Vector& Vector::operator*= (const float& f) {
     x *= f; y *= f; z *= f; w *= f;
     return *this;
+}
+
+float Vector::getDistance2(const Vector& other) {
+    float dx = x - other.x,
+          dy = y - other.y,
+          dz = z - other.z;
+
+    return dx * dx + dy * dy + dz * dz;
+}
+
+Vector Vector::normalize() const {
+    Vector res{x, y, z};
+    res *= 1 / std::sqrt(x*x + y*y + z*z);
+    res.w = 1;
+    return res;
 }
 
 } // namespace math

@@ -14,12 +14,19 @@ out_position = seele.Vector(0, 0, 0, 0)
 out_tex_coord = seele.Vector(0, 0, 0, 0)
 out_pixel = seele.Vector(0, 0, 0, 0)
 
+model = nil
+light = nil
+
 function onLoad()
     model = seele.Model("demo/obj/african_head.obj", "demo/texture/african_head_diffuse.tga")
     model:setScale(seele.Vector(3, 3, 3, 0))
-    model:setPosition(seele.Vector(0, 0, 0, 1))
-    model:setRotation(seele.Vector(-3.14 / 16, 3.14 / 4, 0, 0))
+    model:setPosition(seele.Vector(4, 3, 0, 1))
+    model:setRotation(seele.Vector(0, -3.14 / 4, 0, 0))
+    model:loadNormalTexture("demo/texture/african_head_nm.tga")
     Renderer.setColor(255, 255, 255, 255)
+
+    light = seele.PointLight(seele.Vector(512, 500, 100, 0), 1)
+    LightManager.addLight(light)
 end
 
 function onUpdate(delta)
@@ -37,5 +44,5 @@ function onFragment(tex_coord)
     local pixel = Renderer.getTexturePixel(tex_coord.x, tex_coord.y)
     local color = Renderer.getColor()
     out_pixel = seele.Vector(color.x / 255 * pixel.x, color.y / 255 * pixel.y,
-                             color.z / 255 * pixel.z, color.w / 255 * pixel.w)
+            color.z / 255 * pixel.z, color.w / 255 * pixel.w)
 end

@@ -42,7 +42,8 @@ public:
     void line(const math::Vector& begin, const math::Vector& end);
 
     void triangle(math::Vector v1, math::Vector v2, math::Vector v3,
-                  math::Vector tv1, math::Vector tv2, math::Vector tv3);
+                  math::Vector tv1, math::Vector tv2, math::Vector tv3,
+                  math::Vector nv1, math::Vector nv2, math::Vector nv3);
 
     inline size_t getWidth() const {
         return _width;
@@ -77,6 +78,11 @@ public:
     }
 
     math::Vector getTexturePixel(const float& x, const float& y);
+    math::Vector getNormalTextureDirection(const float& x, const float& y);
+
+    inline void bindNormalTexture(TGAImage* texture) {
+        _normal = texture;
+    }
 
 private:
     using Debug = utils::Debug;
@@ -88,7 +94,7 @@ private:
 
     bool cullBackFace(math::Vector v1, math::Vector v2, math::Vector v3);
 
-    void rasterize(const math::Vector& v, const math::Vector& tv);
+    void rasterize(const math::Vector& v, const math::Vector& tv, const math::Vector& light);
 
     static Renderer* _instance;
 
@@ -101,6 +107,7 @@ private:
     float* _z_buffer;
 
     TGAImage* _texture;
+    TGAImage* _normal;
 
     bool _freeze;
 

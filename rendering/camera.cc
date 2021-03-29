@@ -20,7 +20,7 @@ namespace rendering {
 
 Camera* Camera::_instance = nullptr;
 
-Camera::Camera() : _position(0, 0, 0, 1),
+Camera::Camera() : _position(4, 3, 0, 1),
     _rotation(0, 0, 0), _z_near(5), _z_far(-5), _camera_size(8, 6) {
     auto height = Renderer::getInstance()->getHeight();
     _fov_angle = std::atan2(height, 5) * 2;

@@ -23,7 +23,8 @@
 
 namespace model {
 
-Model::Model(const std::string& filename, const std::string& texture) : _position(), _scale(1, 1, 1), _rotation(0, 0, 0) {
+Model::Model(const std::string& filename, const std::string& texture)
+    : _position(), _scale(1, 1, 1), _rotation(0, 0, 0), _texture(nullptr), _normal(nullptr) {
     FILE* fp = fopen(filename.c_str(), "r");
     if (fp == nullptr) {
         utils::Debug::terminate("can't load model " + filename);
@@ -83,6 +84,7 @@ void Model::draw() {
     for (int i = 0; i < _faces.size(); ++i) {
         const auto f = _faces[i];
         const auto ti = _text_index[i];
+        const auto vi = _normal_index[i];
         auto v0 = camera->perspectiveTransform(trans * _vertex[std::get<0>(f)]);
         v0.x *= renderer->getWidth(); v0.y *= renderer->getHeight();
         auto v1 = camera->perspectiveTransform(trans * _vertex[std::get<1>(f)]);
@@ -92,8 +94,11 @@ void Model::draw() {
         const auto tv0 = _text_coord[std::get<0>(ti)];
         const auto tv1 = _text_coord[std::get<1>(ti)];
         const auto tv2 = _text_coord[std::get<2>(ti)];
+        const auto nv0 = _vertex_normal[std::get<0>(vi)];
+        const auto nv1 = _vertex_normal[std::get<1>(vi)];
+        const auto nv2 = _vertex_normal[std::get<2>(vi)];
 
-        renderer->triangle(v0, v1, v2, tv0, tv1, tv2);
+        renderer->triangle(v0, v1, v2, tv0, tv1, tv2, nv0, nv1, nv2);
     }
 }
 
@@ -139,6 +144,12 @@ void Model::processData(const std::string& cmd, const std::string& data) {
         z = fromString<int>(temp_z.substr(zp1 + 1, zp2 - zp1));
 
         _text_index.emplace_back(x - 1, y - 1, z - 1);
+
+        x = fromString<int>(temp_x.substr(xp2 + 1)),
+        y = fromString<int>(temp_y.substr(yp2 + 1)),
+        z = fromString<int>(temp_z.substr(zp2 + 1));
+
+        _normal_index.emplace_back(x - 1, y - 1, z - 1);
     }
     else if (cmd == "vt") {
         int pos1, pos2;
@@ -152,6 +163,19 @@ void Model::processData(const std::string& cmd, const std::string& data) {
                 y = fromString<float>(data.substr(pos1 + 1, pos2 - pos1 - 1)),
                 z = fromString<float>(data.substr(pos2 + 1));
         _text_coord.emplace_back(x, 1 - y, z);
+    }
+    else if (cmd == "vn") {
+        int pos1, pos2;
+        pos1 = data.find_first_of(' '), pos2 = data.find_last_of(' ');
+
+        if (pos1 == -1 || pos2 == -1) {
+            return;
+        }
+
+        auto x = fromString<float>(data.substr(0, pos1)),
+                y = fromString<float>(data.substr(pos1 + 1, pos2 - pos1 - 1)),
+                z = fromString<float>(data.substr(pos2 + 1));
+        _vertex_normal.emplace_back(x, 1 - y, z);
     }
 }
 
@@ -180,12 +204,25 @@ math::Matrix Model::MVTransform() {
             .move(_position);
     /// view
     auto cr = camera->getRotation();
-    trans.move(camera->getPosition())
+    trans.move(-camera->getPosition())
          .rotate(math::Vector::X, -cr.x)
          .rotate(math::Vector::Y, -cr.y)
          .rotate(math::Vector::Z, -cr.z);
 
     return trans;
+}
+void Model::loadNormalTexture(const std::string& filename) {
+    if (_normal != nullptr) {
+        delete _normal;
+        _normal = nullptr;
+    }
+
+    _normal = new TGAImage();
+    if (!_normal->read_tga_file(filename.c_str())) {
+        utils::Debug::terminate("Can't load normal texture " + filename);
+    }
+
+    rendering::Renderer::getInstance()->bindNormalTexture(_normal);
 }
 
 } // namespace model

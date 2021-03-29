@@ -43,6 +43,8 @@ public:
     inline void setRotation(const math::Vector& rotation) {
         _rotation = rotation;
     }
+
+    void loadNormalTexture(const std::string& filename);
 private:
     using t_face = std::tuple<int, int, int>;
     using q_face = std::tuple<int, int, int>;
@@ -64,14 +66,18 @@ private:
 
     std::vector<math::Vector> _vertex;
     std::vector<math::Vector> _text_coord;
+    std::vector<math::Vector> _vertex_normal;
+
     std::vector<t_face> _faces;
     std::vector<t_face> _text_index;
+    std::vector<t_face> _normal_index;
 
     math::Vector _position;
     math::Vector _scale;
     math::Vector _rotation;
 
     TGAImage* _texture;
+    TGAImage* _normal;
 };
 
 SEELE_REGISTRATION(Model) {
@@ -83,6 +89,7 @@ SEELE_REGISTRATION(Model) {
                 .addFunction("setPosition", &Model::setPosition)
                 .addFunction("setScale", &Model::setScale)
                 .addFunction("setRotation", &Model::setRotation)
+                .addFunction("loadNormalTexture", &Model::loadNormalTexture)
             .endClass()
         .endNamespace();
 }
