@@ -135,7 +135,7 @@ void Renderer::setPixel(const int& x, const int& y, const float& z, const math::
     auto window = window_manager::Window::getInstance();
     auto camera = Camera::getInstance();
     if (x >= 0 && y >= 0 && x < window->_width && y < window->_height &&
-        _z_buffer[y * _width + x] <= z/** && z >= camera->getZNear() && z <= camera->getZFar() **/) {
+        _z_buffer[y * _width + x] <= z && z <= camera->getZNear() && z >= camera->getZFar()) {
         window->_buffer2[((_width * y + x) << 2) | 0] = pixel.x;
         window->_buffer2[((_width * y + x) << 2) | 1] = pixel.y;
         window->_buffer2[((_width * y + x) << 2) | 2] = pixel.z;
@@ -200,7 +200,7 @@ bool Renderer::cullBackFace(math::Vector v1, math::Vector v2, math::Vector v3) {
 //    auto dot = norm * Camera::getInstance()->getPosition();
 //    return (dot >= 0 && _enable_back_face_culling == CullingFace::BACK_FACE) ||
 //    (dot <= 0 && _enable_back_face_culling == CullingFace::FRONT_FACE);
-    // TODO: failed
+    // TODO:
 }
 
 void Renderer::rasterize(const math::Vector& v, const math::Vector& tv, const math::Vector& n) {
