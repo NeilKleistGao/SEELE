@@ -10,44 +10,42 @@
 
 /// @file main.cc
 
-#include <filesystem>
+#include <chrono>
+#include <iomanip>
 
-#include "utils/json_parser.h"
-#include "rendering/renderer.h"
+#include "cxxopts/cxxopts.hpp"
 #include "script/rendering_script.h"
-#include "window_manager/window_manager.h"
-#include "utils/debug.h"
-
-const static std::string TITLE = "Software-rendering ExtendiblE Laboratorial Engine";
-
-namespace window_manager {
-window_manager::Window* window_manager::Window::_instance = nullptr;
-} // namespace window_manager
 
 int main(int argc, char* argv[]) {
-    if (argc < 2) {
-        utils::Debug::terminate("please specify the experiment path.");
+    cxxopts::Options options{"SEELE", "Software-rEndEring Laboratorial Engine"};
+
+    options.add_options()
+    ("s,script", "Rendering Script", cxxopts::value<std::string>())
+    ("r, raytracing", "Enable Ray Tracing", cxxopts::value<bool>()->default_value("false"));
+
+    try {
+        auto result = options.parse(argc, argv);
+        bool using_raytracing = result["raytracing"].as<bool>();
+        std::string script_path = result["script"].as<std::string>();
+
+        if (using_raytracing) {
+            std::cerr << "not support for ray tracing yet!" << std::endl;
+        }
+        else {
+            auto rs = new script::RenderingScript{script_path};
+
+            auto begin = std::chrono::system_clock::now();
+            rs->execute();
+            auto end = std::chrono::system_clock::now();
+
+            std::chrono::duration<double> diff = end - begin;
+            double length = diff.count();
+            std::cout << "rendering finished, using " << std::setw(4) << length << "s." << std::endl;
+        }
     }
-
-    auto base = std::filesystem::path{std::string{argv[1]}};
-    auto win_doc = utils::JsonParser::parseDocument(std::filesystem::path{base} /= "window.json");
-    auto rd_doc = utils::JsonParser::parseDocument(std::filesystem::path{base} /= "rendering.json");
-    auto win = window_manager::Window::getInstance(win_doc["width"].GetInt(), win_doc["height"].GetInt(), TITLE);
-
-    auto rs = script::RenderingScript::getInstance();
-    base = std::filesystem::path{std::string{argv[1]}};
-    rs->preload(base /= "api");
-    base = std::filesystem::path{std::string{argv[1]}};
-    rs->load(base /= win_doc["rendering-script"].GetString());
-
-    win->setDrawFunction(+[](const float& delta){
-        auto rs = script::RenderingScript::getInstance();
-        rs->update(delta);
-    });
-    win->render();
-
-    script::RenderingScript::destroyInstance();
-    window_manager::Window::destroyInstance();
+    catch (...) {
+        std::cerr << options.help() << std::endl;
+    }
 
     return 0;
 }

@@ -1,8 +1,7 @@
-set(SCRIPT_PATH_PREFIX script)
+get_filename_component(_path ${CMAKE_CURRENT_LIST_FILE} PATH)
+file(GLOB _files RELATIVE ${_path} ${_path}/*)
+set(SCRIPT_FILES "")
 
-set(SCRIPT_HEADERS
-        ${SCRIPT_PATH_PREFIX}/script_manager.h
-        ${SCRIPT_PATH_PREFIX}/rendering_script.h)
-set(SCRIPT_SRCS
-        ${SCRIPT_PATH_PREFIX}/script_manager.cc
-        ${SCRIPT_PATH_PREFIX}/rendering_script.cc)
+foreach(_file ${_files})
+    list(APPEND SCRIPT_FILES ${_path}/${_file})
+endforeach()

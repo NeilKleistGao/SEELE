@@ -61,7 +61,7 @@ protected:
 /**
   A reference counted smart pointer.
 
-  The api is compatible with boost::RefCountedPtr and std::RefCountedPtr, in the
+  The lua_api is compatible with boost::RefCountedPtr and std::RefCountedPtr, in the
   sense that it implements a strict subset of the functionality.
 
   This implementation uses a hash table to look up the reference count

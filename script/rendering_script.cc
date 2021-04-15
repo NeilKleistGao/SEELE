@@ -12,57 +12,32 @@
 
 #include "rendering_script.h"
 
+#include "LuaBridge/LuaBridge.h"
+
 namespace script {
-RenderingScript* RenderingScript::_instance = nullptr;
 
-RenderingScript* RenderingScript::getInstance() {
-    if (_instance == nullptr) {
-        _instance = new(std::nothrow) RenderingScript();
-        if (_instance == nullptr) {
-            Debug::terminate("can't create rendering script!");
+RenderingScript::RenderingScript(const std::string& filename) {
+    _state = luaL_newstate();
+    luaL_openlibs(_state);
+    auto err = luaL_dofile(_state, filename.c_str());
+
+    if (err) {
+        std::cerr << "can't open file " << filename << std::endl;
+    }
+}
+
+void RenderingScript::execute() {
+    _thread = std::thread{
+        [&](){
+            auto create_function = luabridge::getGlobal(_state, "onCreate");
+            if (create_function.isFunction()) {
+                create_function();
+                //TODO:
+            }
         }
-    }
+    };
 
-    return _instance;
+    _thread.join();
 }
-
-void RenderingScript::destroyInstance() {
-    if (_instance != nullptr) {
-        delete _instance;
-        _instance = nullptr;
-    }
-}
-
-void RenderingScript::preload(const std::filesystem::path& path) {
-    std::filesystem::directory_iterator dit{path};
-    for (const auto& it : dit) {
-        auto res = luaL_dofile(ScriptManager::getInstance()->getState(), it.path().c_str());
-        if (res) {
-            Debug::terminate("preloading api failed!");
-        }
-    }
-}
-
-void RenderingScript::load(const std::string& filename) {
-    auto res = luaL_dofile(ScriptManager::getInstance()->getState(), filename.c_str());
-    if (res) {
-        Debug::terminate("loading script failed!");
-    }
-
-    luabridge::LuaRef on_load = luabridge::getGlobal(ScriptManager::getInstance()->getState(), "onLoad");
-    if (on_load.isFunction()) {
-        on_load();
-    }
-}
-
-void RenderingScript::update(const float& delta) {
-    luabridge::LuaRef on_update = luabridge::getGlobal(ScriptManager::getInstance()->getState(), "onUpdate");
-    if (on_update.isFunction()) {
-        on_update(delta);
-    }
-}
-
-RenderingScript::RenderingScript() = default;
-RenderingScript::~RenderingScript() = default;
 
 } // namespace script

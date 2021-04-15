@@ -13,59 +13,21 @@
 #ifndef SEELE_RENDERING_SCRIPT_H
 #define SEELE_RENDERING_SCRIPT_H
 
-#include <filesystem>
+#include <string>
+#include <thread>
 
-#include "utils/debug.h"
-#include "script_manager.h"
+#include "lua/lua.hpp"
 
 namespace script {
 
 class RenderingScript {
 public:
-    static RenderingScript* getInstance();
-    static void destroyInstance();
+    explicit RenderingScript(const std::string& filename);
 
-    void preload(const std::filesystem::path& path);
-    void load(const std::string& filename);
-    void update(const float& delta);
-
-    template<typename T>
-    T getGlobalVariable(const std::string& name) {
-        luabridge::LuaRef ref = luabridge::getGlobal(ScriptManager::getInstance()->getState(), name.c_str());
-        if (ref.isNil()) {
-            return T();
-        }
-        else {
-            return ref.cast<T>();
-        }
-    }
-
-    template <typename T>
-    void call(const std::string& name, const T& v) {
-        luabridge::LuaRef ref = luabridge::getGlobal(ScriptManager::getInstance()->getState(), name.c_str());
-        if (!ref.isFunction()) {
-            return;
-        }
-
-        ref(v);
-    }
-
-    template <typename T, typename P>
-    void call(const std::string& name, const T& v1, const P& v2) {
-        luabridge::LuaRef ref = luabridge::getGlobal(ScriptManager::getInstance()->getState(), name.c_str());
-        if (!ref.isFunction()) {
-            return;
-        }
-
-        ref(v1, v2);
-    }
+    void execute();
 private:
-    using Debug = utils::Debug;
-
-    RenderingScript();
-    ~RenderingScript();
-
-    static RenderingScript* _instance;
+    std::thread _thread;
+    lua_State* _state;
 };
 
 } // namespace script

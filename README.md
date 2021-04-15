@@ -1,2 +1,2 @@
 # SEELE
-Software-renderer ExtendiblE Laboratorial Engine
+Software-rEndEring Laboratorial Engine
