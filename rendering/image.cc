@@ -8,43 +8,34 @@
  * it applies also to any other work released this way by its authors. You can apply it to your programs, too.
  */
 
-/// @file camera.cc
+/// @file image.h
 
-#include "camera.h"
+#include "image.h"
 
-#include <cmath>
-
-#include "renderer.h"
+#include <cstring>
 
 namespace rendering {
 
-Camera* Camera::_instance = nullptr;
-
-Camera::Camera() : _position(0, 0, 0, 1),
-    _rotation(0, 0, 0), _z_near(5), _z_far(-150), _camera_size(8, 6) {
-    auto height = Renderer::getInstance()->getHeight();
-    _fov_angle = std::atan2(height, 5) * 2;
+Image::Image(std::string filename, const size_t& width, const size_t& height)
+    : _buffer(nullptr), _filename(std::move(filename)), _width(width), _height(height) {
+    _buffer = new unsigned char[width * height * 3];
+    std::memset(_buffer, 0, sizeof(unsigned char) * width * height * 3)
 }
 
-Camera::~Camera() {
+Image::~Image() {
+    flush();
+    delete[] _buffer;
+    _buffer = nullptr;
 }
 
-Camera* Camera::getInstance() {
-    if (_instance == nullptr) {
-        _instance = new(std::nothrow) Camera();
-
-        if (_instance == nullptr) {
-            Debug::terminate("can't create camera instance.");
-        }
+void Image::putPixel(int x, int y, unsigned char r, unsigned g, unsigned char b) {
+    if (x > -1 && y > -1 && x < _width && y < _height) {
+        y = _height - y - 1;
+        auto index = y * _width + x;
+        _buffer[index] = r;
+        _buffer[index] = g;
+        _buffer[index] = b;
     }
-
-    return _instance;
-}
-
-math::Vector Camera::perspectiveTransform(const math::Vector& v) {
-    return math::Vector{(2 * v.x * 5 / (_position.z - v.z) / _camera_size.x + 0.5f),
-                        (2 * v.y * 5 / (_position.z - v.z) / _camera_size.y + 0.5f),
-                        v.z, 1};
 }
 
 } // namespace rendering

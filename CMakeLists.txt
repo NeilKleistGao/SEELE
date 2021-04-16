@@ -13,7 +13,7 @@ set(PLATFORM_PREFIX "/lib/linux")
 set(EXECUTABLE_OUTPUT_PATH "${CMAKE_SOURCE_DIR}/bin")
 
 #include(window_manager/CMakeLists.txt)
-#include(rendering/CMakeLists.txt)
+include(rendering/CMakeLists.txt)
 #include(utils/CMakeLists.txt)
 include(script/CMakeLists.txt)
 #include(math/CMakeLists.txt)
@@ -23,7 +23,8 @@ include(script/CMakeLists.txt)
 #include(pipelines/CMakeLists.txt)
 
 add_executable(SEELE main.cc
-        ${SCRIPT_FILES})
+        ${SCRIPT_FILES}
+        ${RENDERING_FILES})
 
 target_link_libraries(SEELE "${CMAKE_SOURCE_DIR}/${PLATFORM_PREFIX}/liblua52.so" -ldl)
 

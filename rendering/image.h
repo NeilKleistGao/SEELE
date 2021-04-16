@@ -8,29 +8,35 @@
  * it applies also to any other work released this way by its authors. You can apply it to your programs, too.
  */
 
-/// @file rendering_script.h
+/// @file image.h
 
-#ifndef SEELE_RENDERING_SCRIPT_H
-#define SEELE_RENDERING_SCRIPT_H
+#ifndef SEELE_IMAGE_H
+#define SEELE_IMAGE_H
 
 #include <string>
-#include <thread>
 
-#include "lua/lua.hpp"
+#define STB_IMAGE_IMPLEMENTATION
+#include "include/stb/stb_image.h"
+#define STB_IMAGE_WRITE_IMPLEMENTATION
+#include "include/stb/stb_image_write.h"
 
-namespace script {
+namespace rendering {
 
-class RenderingScript {
+class Image {
 public:
-    explicit RenderingScript(const std::string& filename);
-    ~RenderingScript();
+    Image(std::string filename, const size_t& width, const size_t& height);
+    ~Image();
 
-    void execute();
+    void putPixel(int x, int y, unsigned char r, unsigned g, unsigned char b);
+    inline void flush() {
+        stbi_write_jpg(_filename.c_str(), _width, _height, 3, _buffer, 2);
+    }
 private:
-    std::thread _thread;
-    lua_State* _state;
+    size_t _width, _height;
+    std::string _filename;
+    unsigned char* _buffer;
 };
 
-} // namespace script
+} // namespace rendering
 
-#endif //SEELE_RENDERING_SCRIPT_H
+#endif //SEELE_IMAGE_H

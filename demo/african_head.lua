@@ -10,6 +10,19 @@
 
 --- @file african_head.lua
 
+CONFIGURATION = {}
+CONFIGURATION["width"] = 800
+CONFIGURATION["height"] = 600
+CONFIGURATION["output_filename"] = "african_head.jpg"
+
 function onCreate()
     print("hello world!")
+end
+
+function onVertex()
+
+end
+
+function onFragment()
+
 end

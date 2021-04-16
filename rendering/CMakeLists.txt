@@ -1,8 +1,7 @@
-set(RENDERING_PATH_PREFIX rendering)
+get_filename_component(_path ${CMAKE_CURRENT_LIST_FILE} PATH)
+file(GLOB _files RELATIVE ${_path} ${_path}/*)
+set(RENDERING_FILES "")
 
-set(RENDERING_HEADERS
-        ${RENDERING_PATH_PREFIX}/renderer.h
-        ${RENDERING_PATH_PREFIX}/camera.h)
-set(RENDERING_SRCS
-        ${RENDERING_PATH_PREFIX}/renderer.cc
-        ${RENDERING_PATH_PREFIX}/camera.cc)
+foreach(_file ${_files})
+    list(APPEND RENDERING_FILES ${_path}/${_file})
+endforeach()

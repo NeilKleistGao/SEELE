@@ -26,13 +26,16 @@ RenderingScript::RenderingScript(const std::string& filename) {
     }
 }
 
+RenderingScript::~RenderingScript() {
+    lua_close(_state);
+}
+
 void RenderingScript::execute() {
     _thread = std::thread{
         [&](){
             auto create_function = luabridge::getGlobal(_state, "onCreate");
             if (create_function.isFunction()) {
                 create_function();
-                //TODO:
             }
         }
     };
