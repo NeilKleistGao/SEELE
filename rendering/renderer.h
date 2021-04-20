@@ -13,18 +13,38 @@
 #ifndef SEELE_RENDERER_H
 #define SEELE_RENDERER_H
 
+#include <vector>
+
+#include "i_element.h"
+#include "image.h"
+
 namespace rendering {
+
+enum class RenderingMethod {
+    RENDERING_INHERIT = -1,
+    RENDERING_RASTERIZATION = 0,
+    RENDERING_RAY_TRACING
+};
 
 class Renderer {
 public:
-    static Renderer* getInstance();
+    static Renderer* getInstance(RenderingMethod method = RenderingMethod::RENDERING_INHERIT);
     static void destroyInstance();
 
-private:
-    Renderer();
-    ~Renderer() = default;
+    virtual void render() = 0;
 
+    void init(const std::string& filename, const size_t& width, const size_t& height);
+private:
     static Renderer* _instance;
+protected:
+    Renderer();
+    virtual ~Renderer();
+
+    size_t _width;
+    size_t _height;
+
+    std::vector<IElement*> _elements;
+    Image* _buffer;
 };
 } // namespace rendering
 

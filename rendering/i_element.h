@@ -8,28 +8,22 @@
  * it applies also to any other work released this way by its authors. You can apply it to your programs, too.
  */
 
-/// @file image.h
+/// @file i_element.h
 
-#ifndef SEELE_IMAGE_H
-#define SEELE_IMAGE_H
-
-#include <string>
+#ifndef SEELE_I_ELEMENT_H
+#define SEELE_I_ELEMENT_H
 
 namespace rendering {
 
-class Image {
+class IElement {
 public:
-    Image(std::string filename, const size_t& width, const size_t& height);
-    ~Image();
+    IElement() = default;
+    virtual ~IElement() = default;
 
-    void putPixel(int x, int y, unsigned char r, unsigned g, unsigned char b);
-    void flush();
-private:
-    size_t _width, _height;
-    std::string _filename;
-    unsigned char* _buffer;
+    virtual void render() = 0;
+protected:
 };
 
 } // namespace rendering
 
-#endif //SEELE_IMAGE_H
+#endif //SEELE_I_ELEMENT_H

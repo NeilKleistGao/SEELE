@@ -8,28 +8,22 @@
  * it applies also to any other work released this way by its authors. You can apply it to your programs, too.
  */
 
-/// @file image.h
+/// @file rasterization_renderer.h
 
-#ifndef SEELE_IMAGE_H
-#define SEELE_IMAGE_H
+#ifndef SEELE_RASTERIZATION_RENDERER_H
+#define SEELE_RASTERIZATION_RENDERER_H
 
-#include <string>
+#include "renderer.h"
 
 namespace rendering {
 
-class Image {
+class RasterizationRenderer : public Renderer {
 public:
-    Image(std::string filename, const size_t& width, const size_t& height);
-    ~Image();
-
-    void putPixel(int x, int y, unsigned char r, unsigned g, unsigned char b);
-    void flush();
+    void render() override;
 private:
-    size_t _width, _height;
-    std::string _filename;
-    unsigned char* _buffer;
+protected:
 };
 
 } // namespace rendering
 
-#endif //SEELE_IMAGE_H
+#endif //SEELE_RASTERIZATION_RENDERER_H

@@ -8,28 +8,36 @@
  * it applies also to any other work released this way by its authors. You can apply it to your programs, too.
  */
 
-/// @file image.h
+/// @file shader.cc
 
-#ifndef SEELE_IMAGE_H
-#define SEELE_IMAGE_H
+#include "shader.h"
 
-#include <string>
+namespace script {
 
-namespace rendering {
+std::vector<glm::vec4> Shader::onVertex(const glm::vec4& app_data) {
+    auto res = _function(app_data);
+    std::vector<glm::vec4> list;
 
-class Image {
-public:
-    Image(std::string filename, const size_t& width, const size_t& height);
-    ~Image();
+    if (res.isTable()) {
+        for (int i = 1; i < res.length(); ++i) {
+            list.push_back(res[i].cast<glm::vec4>());
+        }
+    }
+    else {
+        list.push_back(res.cast<glm::vec4>());
+    }
 
-    void putPixel(int x, int y, unsigned char r, unsigned g, unsigned char b);
-    void flush();
-private:
-    size_t _width, _height;
-    std::string _filename;
-    unsigned char* _buffer;
-};
+    return list;
+}
 
-} // namespace rendering
+glm::vec3 Shader::onFragment(const std::vector<glm::vec4>& v2f) {
+    auto list = luabridge::newTable(_state);
+    for (const auto& v : v2f) {
+        list.append(v);
+    }
 
-#endif //SEELE_IMAGE_H
+    auto color = _function(list);
+    return color.cast<glm::vec3>();
+}
+
+} // namespace script

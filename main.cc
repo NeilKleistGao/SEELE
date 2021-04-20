@@ -15,23 +15,32 @@
 
 #include "cxxopts/cxxopts.hpp"
 #include "script/rendering_script.h"
+#include "rendering/renderer.h"
 
 int main(int argc, char* argv[]) {
     cxxopts::Options options{"SEELE", "Software-rEndEring Laboratorial Engine"};
 
     options.add_options()
     ("s,script", "Rendering Script", cxxopts::value<std::string>())
-    ("r, raytracing", "Enable Ray Tracing", cxxopts::value<bool>()->default_value("false"));
+    ("r,raytracing", "Enable Ray Tracing", cxxopts::value<bool>()->default_value("false"))
+    ("w,width", "Image Width", cxxopts::value<int>()->default_value("800"))
+    ("h,height", "Image Height", cxxopts::value<int>()->default_value("600"))
+    ("f,filename", "Output Filename", cxxopts::value<std::string>()->default_value("output.jpg"));
 
     try {
         auto result = options.parse(argc, argv);
         bool using_raytracing = result["raytracing"].as<bool>();
         std::string script_path = result["script"].as<std::string>();
+        int width = result["width"].as<int>(),
+            height = result["height"].as<int>();
+        std::string output_file = result["filename"].as<std::string>();
 
         if (using_raytracing) {
             std::cerr << "not support for ray tracing yet!" << std::endl;
         }
         else {
+            rendering::Renderer::getInstance(rendering::RenderingMethod::RENDERING_RASTERIZATION)
+                        ->init(output_file, width, height);
             auto rs = new script::RenderingScript{script_path};
 
             auto begin = std::chrono::system_clock::now();
@@ -41,6 +50,8 @@ int main(int argc, char* argv[]) {
             std::chrono::duration<double> diff = end - begin;
             double length = diff.count();
             std::cout << "rendering finished, using " << std::setw(4) << length << "s." << std::endl;
+
+            rendering::Renderer::destroyInstance();
         }
     }
     catch (...) {

@@ -11,6 +11,7 @@
 /// @file rendering_script.cc
 
 #include "rendering_script.h"
+#include "rendering/renderer.h"
 
 #include "LuaBridge/LuaBridge.h"
 
@@ -31,16 +32,16 @@ RenderingScript::~RenderingScript() {
 }
 
 void RenderingScript::execute() {
-    _thread = std::thread{
-        [&](){
-            auto create_function = luabridge::getGlobal(_state, "onCreate");
-            if (create_function.isFunction()) {
-                create_function();
-            }
-        }
-    };
+    auto create_function = luabridge::getGlobal(_state, "onCreate");
+    if (create_function.isFunction()) {
+        create_function();
+    }
 
-    _thread.join();
+    rendering::Renderer::getInstance()->render();
+}
+
+void RenderingScript::registerElements() {
+    // TODO:
 }
 
 } // namespace script

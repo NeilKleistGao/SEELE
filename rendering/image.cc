@@ -14,12 +14,17 @@
 
 #include <cstring>
 
+#define STB_IMAGE_IMPLEMENTATION
+#include "include/stb/stb_image.h"
+#define STB_IMAGE_WRITE_IMPLEMENTATION
+#include "include/stb/stb_image_write.h"
+
 namespace rendering {
 
 Image::Image(std::string filename, const size_t& width, const size_t& height)
     : _buffer(nullptr), _filename(std::move(filename)), _width(width), _height(height) {
     _buffer = new unsigned char[width * height * 3];
-    std::memset(_buffer, 0, sizeof(unsigned char) * width * height * 3)
+    std::memset(_buffer, 0, sizeof(unsigned char) * width * height * 3);
 }
 
 Image::~Image() {
@@ -36,6 +41,10 @@ void Image::putPixel(int x, int y, unsigned char r, unsigned g, unsigned char b)
         _buffer[index] = g;
         _buffer[index] = b;
     }
+}
+
+void Image::flush() {
+    stbi_write_jpg(_filename.c_str(), _width, _height, 3, _buffer, 2);
 }
 
 } // namespace rendering

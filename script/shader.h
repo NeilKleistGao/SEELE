@@ -8,28 +8,31 @@
  * it applies also to any other work released this way by its authors. You can apply it to your programs, too.
  */
 
-/// @file image.h
+/// @file shader.h
 
-#ifndef SEELE_IMAGE_H
-#define SEELE_IMAGE_H
+#ifndef SEELE_SHADER_H
+#define SEELE_SHADER_H
 
-#include <string>
+#include <vector>
 
-namespace rendering {
+#include "lua/lua.hpp"
+#include "LuaBridge/LuaBridge.h"
+#include "glm/glm.hpp"
 
-class Image {
+namespace script {
+
+class Shader {
 public:
-    Image(std::string filename, const size_t& width, const size_t& height);
-    ~Image();
+    Shader(const luabridge::LuaRef& function, lua_State*& state) : _function(function), _state(state) {}
+    ~Shader() = default;
 
-    void putPixel(int x, int y, unsigned char r, unsigned g, unsigned char b);
-    void flush();
+    std::vector<glm::vec4> onVertex(const glm::vec4& app_data);
+    glm::vec3 onFragment(const std::vector<glm::vec4>& v2f);
 private:
-    size_t _width, _height;
-    std::string _filename;
-    unsigned char* _buffer;
+    lua_State*& _state;
+    luabridge::LuaRef _function;
 };
 
-} // namespace rendering
+} // namespace script
 
-#endif //SEELE_IMAGE_H
+#endif //SEELE_SHADER_H

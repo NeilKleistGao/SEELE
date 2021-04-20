@@ -12,19 +12,32 @@
 
 
 #include "renderer.h"
+#include "rasterization_renderer.h"
 
-#include <cmath>
 #include <algorithm>
 
 namespace rendering {
 Renderer* Renderer::_instance = nullptr;
 
-Renderer::Renderer() {
+Renderer::Renderer() : _buffer(nullptr) {}
+
+Renderer::~Renderer() {
+    _buffer->flush();
+    delete _buffer;
+    _buffer = nullptr;
 }
 
-Renderer* Renderer::getInstance() {
+Renderer* Renderer::getInstance(RenderingMethod method) {
     if (_instance == nullptr) {
-        _instance = new(std::nothrow) Renderer();
+        switch (method) {
+            case RenderingMethod::RENDERING_RASTERIZATION:
+                _instance = new(std::nothrow) RasterizationRenderer();
+                break;
+            case RenderingMethod::RENDERING_RAY_TRACING:
+                break;
+            default:
+                break;
+        }
     }
 
     return _instance;
@@ -35,6 +48,11 @@ void Renderer::destroyInstance() {
         delete _instance;
         _instance = nullptr;
     }
+}
+
+void Renderer::init(const std::string& filename, const size_t& width, const size_t& height) {
+    _width = width; _height = height;
+    _buffer = new Image{filename, width, height};
 }
 
 } // namespace rendering

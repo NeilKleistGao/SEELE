@@ -14,7 +14,6 @@
 #define SEELE_RENDERING_SCRIPT_H
 
 #include <string>
-#include <thread>
 
 #include "lua/lua.hpp"
 
@@ -27,8 +26,9 @@ public:
 
     void execute();
 private:
-    std::thread _thread;
     lua_State* _state;
+
+    void registerElements();
 };
 
 } // namespace script
