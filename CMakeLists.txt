@@ -28,12 +28,12 @@ add_executable(SEELE main.cc
 
 target_link_libraries(SEELE "${CMAKE_SOURCE_DIR}/${PLATFORM_PREFIX}/liblua52.so" -ldl)
 
-set_target_properties(SEELE PROPERTIES
-        COMPILE_FLAGS "-pthread"
-        LINK_FLAGS "-pthread")
+#set_target_properties(SEELE PROPERTIES
+#        COMPILE_FLAGS "-pthread"
+#        LINK_FLAGS "-pthread")
 
-add_custom_command(TARGET ${PROJECT_NAME}
-        PRE_BUILD
-        COMMAND ${CMAKE_COMMAND}
-        ARGS -E copy_directory "../lua_api" "${EXECUTABLE_OUTPUT_PATH}/lua_api"
-        COMMENT "COPY CONFIGURATION FILES")
+#add_custom_command(TARGET ${PROJECT_NAME}
+#        PRE_BUILD
+#        COMMAND ${CMAKE_COMMAND}
+#        ARGS -E copy_directory "../lua_api" "${EXECUTABLE_OUTPUT_PATH}/lua_api"
+#        COMMENT "COPY CONFIGURATION FILES")

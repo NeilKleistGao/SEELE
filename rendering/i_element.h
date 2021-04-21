@@ -13,6 +13,8 @@
 #ifndef SEELE_I_ELEMENT_H
 #define SEELE_I_ELEMENT_H
 
+#include "glm/glm.hpp"
+
 namespace rendering {
 
 class IElement {
@@ -20,7 +22,9 @@ public:
     IElement() = default;
     virtual ~IElement() = default;
 
+    virtual void assemble() = 0;
     virtual void render() = 0;
+    virtual glm::vec4 modelTransform(const glm::vec4& vec) = 0;
 protected:
 };
 

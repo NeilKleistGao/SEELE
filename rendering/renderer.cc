@@ -13,8 +13,7 @@
 
 #include "renderer.h"
 #include "rasterization_renderer.h"
-
-#include <algorithm>
+#include "camera.h"
 
 namespace rendering {
 Renderer* Renderer::_instance = nullptr;
@@ -53,6 +52,25 @@ void Renderer::destroyInstance() {
 void Renderer::init(const std::string& filename, const size_t& width, const size_t& height) {
     _width = width; _height = height;
     _buffer = new Image{filename, width, height};
+}
+
+glm::vec4 Renderer::transformMVP(const glm::vec4& vec) {
+    auto camera = Camera::getInstance();
+    glm::vec4 res{};
+
+    res = _current->modelTransform(vec);
+    res = camera->viewPointTransform(res);
+    res = camera->perspectiveTransform(res);
+
+    return res;
+}
+
+script::Shader* Renderer::getShader(const std::string& name) {
+    if (_shaders.find(name) == _shaders.end()) {
+        return nullptr;
+    }
+
+    return _shaders[name];
 }
 
 } // namespace rendering

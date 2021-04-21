@@ -14,9 +14,11 @@
 #define SEELE_RENDERER_H
 
 #include <vector>
+#include <map>
 
 #include "i_element.h"
 #include "image.h"
+#include "script/shader.h"
 
 namespace rendering {
 
@@ -34,6 +36,18 @@ public:
     virtual void render() = 0;
 
     void init(const std::string& filename, const size_t& width, const size_t& height);
+
+    inline void addElement(IElement* element) {
+        _elements.push_back(element);
+    }
+
+    glm::vec4 transformMVP(const glm::vec4& vec);
+
+    void addShader(const std::string& name, script::Shader* shader) {
+        _shaders[name] = shader;
+    }
+
+    script::Shader* getShader(const std::string& name);
 private:
     static Renderer* _instance;
 protected:
@@ -44,7 +58,10 @@ protected:
     size_t _height;
 
     std::vector<IElement*> _elements;
+    std::map<std::string, script::Shader*> _shaders;
     Image* _buffer;
+
+    IElement* _current;
 };
 } // namespace rendering
 

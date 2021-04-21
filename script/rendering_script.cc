@@ -37,6 +37,18 @@ void RenderingScript::execute() {
         create_function();
     }
 
+    auto shaders_table = luabridge::getGlobal(_state, "SHADERS");
+    if (shaders_table.isTable()) {
+        for (int i = 1; i <= shaders_table.length(); ++i) {
+            auto item = shaders_table[i];
+            auto name = item[1].cast<std::string>();
+            auto function = item[2];
+
+            auto shader = new Shader{function, _state};
+            rendering::Renderer::getInstance()->addShader(name, shader);
+        }
+    }
+
     rendering::Renderer::getInstance()->render();
 }
 

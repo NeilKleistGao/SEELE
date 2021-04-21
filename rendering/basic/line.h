@@ -13,13 +13,22 @@
 #ifndef SEELE_LINE_H
 #define SEELE_LINE_H
 
+#include "glm/glm.hpp"
 #include "../i_element.h"
 
 namespace rendering::basic {
 
 class Line : public IElement {
 public:
+    Line(const glm::vec3& begin, const glm::vec3& end);
+
+    void render() override;
+    void assemble() override;
+
+    glm::vec4 modelTransform(const glm::vec4& vec) override;
 private:
+    glm::vec4 _begin;
+    glm::vec4 _end;
 protected:
 };
 

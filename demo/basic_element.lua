@@ -8,16 +8,21 @@
  - it applies also to any other work released this way by its authors. You can apply it to your programs, too.
  --]]
 
---- @file african_head.lua
+--- @file basic_element.lua
+
+SHADERS = {
+    {"onVertex", onVertex},
+    {"onFragment", onFragment}
+}
 
 function onCreate()
-    print("hello world!")
+    --line1 = Line.new(vec3.new{200, 300, 0}, vec3.new{200, 400, 0}, "onVertex", "onFragment")
 end
 
-function onVertex()
-
+function onVertex(app_data)
+    --Renderer.
 end
 
-function onFragment()
+function onFragment(v2f)
 
 end

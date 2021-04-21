@@ -15,7 +15,11 @@
 namespace rendering {
 
 void RasterizationRenderer::render() {
-
+    for (auto* ele : _elements) {
+        _current = ele;
+        ele->assemble();
+        ele->render();
+    }
 }
 
 } // namespace rendering

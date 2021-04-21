@@ -8,28 +8,34 @@
  * it applies also to any other work released this way by its authors. You can apply it to your programs, too.
  */
 
-/// @file line.cc
+/// @file camera.h
 
-#include "line.h"
+#ifndef SEELE_CAMERA_H
+#define SEELE_CAMERA_H
 
-#include "rendering/renderer.h"
-#include "rendering/camera.h"
+#include "glm/glm.hpp"
 
-namespace rendering::basic {
+namespace rendering {
 
-Line::Line(const glm::vec3& begin, const glm::vec3& end) : IElement(), _begin(begin, 1), _end(end, 1) {
-    rendering::Renderer::getInstance()->addElement(this);
-}
+class Camera {
+public:
+    static Camera* getInstance();
+    static void destroyInstance();
 
-void Line::render() {
-}
+    void init(const glm::vec3& position, const glm::vec3& look_at, const glm::vec4& perspective);
 
-glm::vec4 Line::modelTransform(const glm::vec4& vec) {
-    return vec;
-}
+    glm::vec4 viewPointTransform(const glm::vec4& vec);
+    glm::vec4 perspectiveTransform(const glm::vec4& vec);
+private:
+    static Camera* _instance;
 
-void Line::assemble() {
+    glm::mat4 _view_point;
+    glm::mat4 _perspective;
+protected:
+    Camera();
+    ~Camera();
+};
 
-}
+} // namespace rendering
 
-} // namespace rendering::basic
+#endif //SEELE_CAMERA_H
