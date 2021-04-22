@@ -1,8 +1,0 @@
-set(WINDOW_MANAGER_PATH_PREFIX window_manager)
-
-set(WINDOW_MANAGER_HEADERS
-        ${WINDOW_MANAGER_PATH_PREFIX}/window_manager.h
-        ${WINDOW_MANAGER_PATH_PREFIX}/linux.h)
-
-set(WINDOW_MANAGER_SRCS
-        ${WINDOW_MANAGER_PATH_PREFIX}/linux.cc)

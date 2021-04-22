@@ -477,7 +477,7 @@ typedef float (stbir__support_fn)(float scale);
 
 typedef struct
 {
-    stbir__kernel_fn* kernel;
+    stbir__kernel_fn* core;
     stbir__support_fn* support;
 } stbir__filter_info;
 
@@ -1051,7 +1051,7 @@ static void stbir__calculate_coefficients_upsample(stbir_filter filter, float sc
     for (i = 0; i <= in_last_pixel - in_first_pixel; i++)
     {
         float in_pixel_center = (float)(i + in_first_pixel) + 0.5f;
-        coefficient_group[i] = stbir__filter_info_table[filter].kernel(in_center_of_out - in_pixel_center, 1 / scale);
+        coefficient_group[i] = stbir__filter_info_table[filter].core(in_center_of_out - in_pixel_center, 1 / scale);
 
         // If the coefficient is zero, skip it. (Don't do the <0 check here, we want the influence of those outside pixels.)
         if (i == 0 && !coefficient_group[i])
@@ -1064,7 +1064,7 @@ static void stbir__calculate_coefficients_upsample(stbir_filter filter, float sc
         total_filter += coefficient_group[i];
     }
 
-    STBIR_ASSERT(stbir__filter_info_table[filter].kernel((float)(in_last_pixel + 1) + 0.5f - in_center_of_out, 1/scale) == 0);
+    STBIR_ASSERT(stbir__filter_info_table[filter].core((float)(in_last_pixel + 1) + 0.5f - in_center_of_out, 1/scale) == 0);
 
     STBIR_ASSERT(total_filter > 0.9);
     STBIR_ASSERT(total_filter < 1.1f); // Make sure it's not way off.
@@ -1100,10 +1100,10 @@ static void stbir__calculate_coefficients_downsample(stbir_filter filter, float 
     {
         float out_pixel_center = (float)(i + out_first_pixel) + 0.5f;
         float x = out_pixel_center - out_center_of_in;
-        coefficient_group[i] = stbir__filter_info_table[filter].kernel(x, scale_ratio) * scale_ratio;
+        coefficient_group[i] = stbir__filter_info_table[filter].core(x, scale_ratio) * scale_ratio;
     }
 
-    STBIR_ASSERT(stbir__filter_info_table[filter].kernel((float)(out_last_pixel + 1) + 0.5f - out_center_of_in, scale_ratio) == 0);
+    STBIR_ASSERT(stbir__filter_info_table[filter].core((float)(out_last_pixel + 1) + 0.5f - out_center_of_in, scale_ratio) == 0);
 
     for (i = out_last_pixel - out_first_pixel; i >= 0; i--)
     {
@@ -1190,7 +1190,7 @@ static void stbir__normalize_downsample_coefficients(stbir__contributors* contri
         contributors[i].n1 = stbir__min(contributors[i].n1, output_size - 1);
 }
 
-// Each scan line uses the same kernel values so we should calculate the kernel
+// Each scan line uses the same core values so we should calculate the core
 // values once and then we can use them for every scan line.
 static void stbir__calculate_filters(stbir__contributors* contributors, float* coefficients, stbir_filter filter, float scale_ratio, float shift, int input_size, int output_size)
 {

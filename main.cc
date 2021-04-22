@@ -12,47 +12,54 @@
 
 #include <chrono>
 #include <iomanip>
+#include <thread>
+#include <atomic>
 
 #include "cxxopts/cxxopts.hpp"
-#include "script/rendering_script.h"
-#include "rendering/renderer.h"
+#include "core/general/renderer.h"
+
+std::atomic<core::general::Renderer*> renderer;
+
+void monitor() {
+
+}
 
 int main(int argc, char* argv[]) {
     cxxopts::Options options{"SEELE", "Software-rEndEring Laboratorial Engine"};
 
     options.add_options()
     ("s,script", "Rendering Script", cxxopts::value<std::string>())
-    ("r,raytracing", "Enable Ray Tracing", cxxopts::value<bool>()->default_value("false"))
-    ("w,width", "Image Width", cxxopts::value<int>()->default_value("800"))
-    ("h,height", "Image Height", cxxopts::value<int>()->default_value("600"))
+    ("m,method", "Rendering Method", cxxopts::value<std::string>()->default_value("rasterization"))
+    ("w,width", "Image Width", cxxopts::value<int>()->default_value("1024"))
+    ("h,height", "Image Height", cxxopts::value<int>()->default_value("768"))
     ("f,filename", "Output Filename", cxxopts::value<std::string>()->default_value("output.jpg"));
 
     try {
         auto result = options.parse(argc, argv);
-        bool using_raytracing = result["raytracing"].as<bool>();
+        std::string method = result["method"].as<std::string>();
         std::string script_path = result["script"].as<std::string>();
         int width = result["width"].as<int>(),
             height = result["height"].as<int>();
         std::string output_file = result["filename"].as<std::string>();
 
-        if (using_raytracing) {
-            std::cerr << "not support for ray tracing yet!" << std::endl;
+        auto begin = std::chrono::system_clock::now();
+        if (method == "rasterization") {
+
+        }
+        else if (method == "raytracing") {
+
+        }
+        else if (method == "photon") {
+
         }
         else {
-            rendering::Renderer::getInstance(rendering::RenderingMethod::RENDERING_RASTERIZATION)
-                        ->init(output_file, width, height);
-            auto rs = new script::RenderingScript{script_path};
-
-            auto begin = std::chrono::system_clock::now();
-            rs->execute();
-            auto end = std::chrono::system_clock::now();
-
-            std::chrono::duration<double> diff = end - begin;
-            double length = diff.count();
-            std::cout << "rendering finished, using " << std::setw(4) << length << "s." << std::endl;
-
-            rendering::Renderer::destroyInstance();
+            throw std::exception{};
         }
+        auto end = std::chrono::system_clock::now();
+
+        std::chrono::duration<double> diff = end - begin;
+        double length = diff.count();
+        std::cout << "rendering finished, using " << std::setw(4) << length << "s." << std::endl;
     }
     catch (...) {
         std::cerr << options.help() << std::endl;

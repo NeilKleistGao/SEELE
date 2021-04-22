@@ -1,0 +1,6 @@
+file(GLOB _files RELATIVE ${CMAKE_CURRENT_LIST_DIR} ${CMAKE_CURRENT_LIST_DIR}/*)
+set(RASTERIZATION_LIST )
+
+foreach(_file ${_files})
+    list(APPEND RASTERIZATION_LIST ${CMAKE_CURRENT_LIST_DIR}/${_file})
+endforeach()
