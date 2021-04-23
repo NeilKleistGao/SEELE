@@ -11,3 +11,41 @@
 /// @file texture.cc
 
 #include "texture.h"
+
+#include <algorithm>
+
+#define STB_IMAGE_IMPLEMENTATION
+#include "stb/stb_image.h"
+
+namespace assets {
+
+Texture::Texture(const std::string& filename) : _channel(), _height(), _width(), _image(nullptr) {
+    _image = stbi_load(filename.c_str(), &_width, &_height, &_channel, 0);
+}
+
+Texture::~Texture() {
+    delete _image;
+    _image = nullptr;
+}
+
+glm::vec4 Texture::getColor(float x, float y) const {
+    x = std::min(x, 1.0f);
+    x = std::max(0.0f, x);
+    y = std::min(y, 1.0f);
+    y = std::max(0.0f, y);
+
+    int ix = x * _width, iy = y * _height;
+    int index = iy * _width + ix * _channel;
+
+    if (_channel == 3) {
+        return glm::vec4 {_image[index], _image[index + 1], _image[index + 2], 0};
+    }
+    else if (_channel == 4) {
+        return glm::vec4 {_image[index], _image[index + 1], _image[index + 2], _image[index + 3]};
+    }
+    else {
+        return glm::vec4 {};
+    }
+}
+
+} // namespace assets

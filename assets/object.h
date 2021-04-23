@@ -18,17 +18,22 @@
 
 #include "glm/glm.hpp"
 
+namespace objl {
+class Loader;
+} // namespace objl
+
 namespace assets {
 
 class Object {
 public:
     explicit Object(std::string filename);
     ~Object();
+
+    Object(const Object&) = delete;
+    Object& operator=(const Object&) = delete;
+    Object(Object&&) = delete;
 private:
-    std::vector<glm::vec3> _vertex;
-    std::vector<glm::vec3> _normal;
-    std::vector<glm::vec3> _uv;
-    std::vector<glm::mat3> _faces;
+    objl::Loader* _loader;
 protected:
 };
 

@@ -11,3 +11,18 @@
 /// @file object.cc
 
 #include "object.h"
+
+#include "OBJLoader/OBJ_Loader.hpp"
+
+namespace assets {
+
+Object::Object(std::string filename) : _loader(new objl::Loader()) {
+    _loader->LoadFile(filename);
+}
+
+Object::~Object() {
+    delete _loader;
+    _loader = nullptr;
+}
+
+} // namespace assets

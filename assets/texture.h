@@ -13,4 +13,30 @@
 #ifndef SEELE_TEXTURE_H
 #define SEELE_TEXTURE_H
 
+#include <string>
+
+#include "glm/glm.hpp"
+
+namespace assets {
+
+class Texture {
+public:
+    explicit Texture(const std::string& filename);
+    ~Texture();
+
+    Texture(const Texture&) = delete;
+    Texture& operator=(const Texture&) = delete;
+    Texture(Texture&&) = delete;
+
+    glm::vec4 getColor(float x, float y) const;
+private:
+    int _width;
+    int _height;
+    int _channel;
+    unsigned char* _image;
+protected:
+};
+
+} // namespace assets
+
 #endif //SEELE_TEXTURE_H
