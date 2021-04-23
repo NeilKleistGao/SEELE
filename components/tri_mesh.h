@@ -8,7 +8,6 @@
  * it applies also to any other work released this way by its authors. You can apply it to your programs, too.
  */
 
-
 /// @file tri_mesh.h
 
 

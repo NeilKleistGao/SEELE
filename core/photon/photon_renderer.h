@@ -18,7 +18,11 @@
 namespace core::photon {
 
 class PhotonRenderer : public general::Renderer {
-
+public:
+    PhotonRenderer(const std::string& script_name, std::string output, int width, int height);
+    void render() override;
+private:
+protected:
 };
 
 } // namespace core::photon

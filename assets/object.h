@@ -13,4 +13,25 @@
 #ifndef SEELE_OBJECT_H
 #define SEELE_OBJECT_H
 
+#include <string>
+#include <vector>
+
+#include "glm/glm.hpp"
+
+namespace assets {
+
+class Object {
+public:
+    explicit Object(std::string filename);
+    ~Object();
+private:
+    std::vector<glm::vec3> _vertex;
+    std::vector<glm::vec3> _normal;
+    std::vector<glm::vec3> _uv;
+    std::vector<glm::mat3> _faces;
+protected:
+};
+
+} // namespace assets
+
 #endif //SEELE_OBJECT_H

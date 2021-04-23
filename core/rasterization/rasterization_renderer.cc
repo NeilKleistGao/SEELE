@@ -11,3 +11,16 @@
 /// @file rasterization_renderer.cc
 
 #include "rasterization_renderer.h"
+
+namespace core::rasterization {
+
+RasterizationRenderer::RasterizationRenderer(const std::string& script_name, std::string output, int width, int height)
+    : general::Renderer(script_name, output, width, height) {
+
+}
+
+void RasterizationRenderer::render() {
+
+}
+
+} // namespace core::rasterization

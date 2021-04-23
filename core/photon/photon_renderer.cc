@@ -11,3 +11,15 @@
 /// @file photon_renderer.cc
 
 #include "photon_renderer.h"
+
+namespace core::photon {
+
+PhotonRenderer::PhotonRenderer(const std::string& script_name, std::string output, int width, int height)
+    : general::Renderer(script_name, output, width, height) {
+}
+
+void PhotonRenderer::render() {
+
+}
+
+} // namespace core::photon

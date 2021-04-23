@@ -17,11 +17,26 @@
 
 #include "cxxopts/cxxopts.hpp"
 #include "core/general/renderer.h"
+#include "core/rasterization/rasterization_renderer.h"
+#include "core/raytracing/raytracing_renderer.h"
+#include "core/photon/photon_renderer.h"
 
-std::atomic<core::general::Renderer*> renderer;
+static core::general::Renderer* render;
+static std::atomic<bool> finished;
 
 void monitor() {
+    while (!finished.load()) {
+        auto process = render->getProcess() * 100;
+        printf("\rRendering[%.2f%%]: ", process);
 
+        for (int i = 0; i <= process; i++) {
+            printf("█");
+        }
+        puts("");
+
+        using namespace std::chrono_literals;
+        std::this_thread::sleep_for(300ms);
+    }
 }
 
 int main(int argc, char* argv[]) {
@@ -44,22 +59,32 @@ int main(int argc, char* argv[]) {
 
         auto begin = std::chrono::system_clock::now();
         if (method == "rasterization") {
-
+            render = new core::rasterization::RasterizationRenderer(script_path, output_file, width, height);
         }
         else if (method == "raytracing") {
-
+            render = new core::raytracing::RaytracingRenderer(script_path, output_file, width, height);
         }
         else if (method == "photon") {
-
+            render = new core::photon::PhotonRenderer(script_path, output_file, width, height);
         }
         else {
             throw std::exception{};
         }
+
+        finished.store(false);
+        std::thread monitor_thread{monitor};
+        render->render();
+        finished.store(true);
+        monitor_thread.join();
+
         auto end = std::chrono::system_clock::now();
 
         std::chrono::duration<double> diff = end - begin;
         double length = diff.count();
         std::cout << "rendering finished, using " << std::setw(4) << length << "s." << std::endl;
+
+        delete render;
+        render = nullptr;
     }
     catch (...) {
         std::cerr << options.help() << std::endl;

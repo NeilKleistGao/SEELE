@@ -17,8 +17,12 @@
 
 namespace core::raytracing {
 
-class RaytracingRenderer : general::Renderer {
-
+class RaytracingRenderer : public general::Renderer {
+public:
+    RaytracingRenderer(const std::string& script_name, std::string output, int width, int height);
+    void render() override;
+private:
+protected:
 };
 
 } // namespace core::raytracing

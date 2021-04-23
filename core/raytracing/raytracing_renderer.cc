@@ -11,3 +11,16 @@
 /// @file raytracing_renderer.cc
 
 #include "raytracing_renderer.h"
+
+namespace core::raytracing {
+
+RaytracingRenderer::RaytracingRenderer(const std::string& script_name, std::string output, int width, int height)
+    : general::Renderer(script_name, output, width, height) {
+
+}
+
+void RaytracingRenderer::render() {
+
+}
+
+} // namespace core::raytracing
