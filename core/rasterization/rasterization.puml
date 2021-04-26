@@ -1,0 +1,16 @@
+@startuml
+start
+:read lua script;
+:call create function;
+:load elements;
+:register elements in renderer;
+:register camera;
+repeat
+    :vertex shader;
+    :interpolate;
+    :fragment shader;
+    :z buffer test;
+    :write into image;
+repeat while (more elements?)
+stop
+@enduml

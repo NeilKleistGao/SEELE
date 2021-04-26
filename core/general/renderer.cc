@@ -57,4 +57,12 @@ void Renderer::create() {
     function();
 }
 
+Shader* Renderer::getShader(const std::string& name) {
+    if (_shaders.find(name) == _shaders.end()) {
+        return nullptr;
+    }
+
+    return _shaders[name];
+}
+
 } // namespace core::general

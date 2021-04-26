@@ -24,7 +24,7 @@ namespace core::general {
 
 class Shader {
 public:
-    struct V2FItem {
+    struct ShaderDataItem {
         union {
             float f;
             glm::vec2 vec2;
@@ -38,8 +38,8 @@ public:
 
     Shader(lua_State* state, const std::string& function_name);
 
-    std::vector<V2FItem> onVertex(const luabridge::LuaRef& appdata);
-    glm::vec3 onFragment(const std::vector<V2FItem>& v2f);
+    std::vector<ShaderDataItem> onVertex(const std::vector<ShaderDataItem>& appdata);
+    glm::vec3 onFragment(const std::vector<ShaderDataItem>& v2f);
 private:
     lua_State* _state;
     luabridge::LuaRef _function;
@@ -47,6 +47,9 @@ private:
     static constexpr int DIMENSION_INDEX = 1;
     static constexpr int DATA_INDEX = 2;
     static constexpr int INTERPOLATION_INDEX = 3;
+
+    luabridge::LuaRef createTable(const std::vector<ShaderDataItem>& data);
+    std::vector<ShaderDataItem> parseTable(const luabridge::LuaRef& table);
 protected:
 };
 

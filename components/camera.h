@@ -13,4 +13,16 @@
 #ifndef SEELE_CAMERA_H
 #define SEELE_CAMERA_H
 
+#include "transform.h"
+
+namespace components {
+
+class Camera : public Transform {
+public:
+private:
+protected:
+};
+
+} // namespace components
+
 #endif //SEELE_CAMERA_H

@@ -13,7 +13,56 @@
 #ifndef SEELE_TRANSFORM_H
 #define SEELE_TRANSFORM_H
 
+#include "glm/glm.hpp"
+
+namespace core::rasterization {
+class RasterizationRenderer;
+} // namespace core::general
+
 namespace components {
+class Transform {
+public:
+    Transform();
+    ~Transform() = default;
+
+    void setPosition(const glm::vec3& position) {
+        _position = position;
+    }
+
+    inline void setRotation(const glm::vec3& rotation) {
+        _rotation = rotation;
+    }
+
+    inline void setScale(const glm::vec3& scale) {
+        _scale = scale;
+    }
+
+    inline glm::vec3 getPosition() const {
+        return _position;
+    }
+
+    inline glm::vec3 getRotation() const {
+        return _rotation;
+    }
+
+    inline glm::vec3 getScale() const {
+        return _scale;
+    }
+
+    inline glm::vec4 transform(const glm::vec4& v) {
+        return _model * v;
+    }
+
+    virtual void rasterize(core::rasterization::RasterizationRenderer* renderer) = 0;
+private:
+    glm::mat4 _model;
+protected:
+    glm::vec3 _position;
+    glm::vec3 _rotation;
+    glm::vec3 _scale;
+
+    void updateModelMatrix();
+};
 
 } // namespace components
 

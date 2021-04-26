@@ -14,12 +14,14 @@
 #define SEELE_RENDERER_H
 
 #include <map>
+#include <list>
 
 #include "lua/lua.hpp"
 #include "LuaBridge/LuaBridge.h"
 
 #include "image.h"
 #include "shader.h"
+#include "components/transform.h"
 
 namespace core::general {
 
@@ -33,6 +35,16 @@ public:
     inline float getProcess() const {
         return _process;
     }
+
+    inline void addObject(components::Transform* transform) {
+        _transforms.push_back(transform);
+    }
+
+    inline void setCamera() {}
+
+    inline void addLight() {}
+
+    Shader* getShader(const std::string& name);
 private:
     lua_State* _state;
     std::map<std::string, Shader*> _shaders;
@@ -41,6 +53,9 @@ private:
 protected:
     float _process;
     Image* _image;
+    components::Transform* _current;
+
+    std::list<components::Transform*> _transforms;
 
     void create();
 };

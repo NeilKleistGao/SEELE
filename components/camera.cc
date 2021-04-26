@@ -11,3 +11,7 @@
 /// @file camera.cc
 
 #include "camera.h"
+
+namespace components {
+
+} // namespace components

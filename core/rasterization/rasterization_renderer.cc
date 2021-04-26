@@ -12,15 +12,30 @@
 
 #include "rasterization_renderer.h"
 
+#include <utility>
+
 namespace core::rasterization {
 
 RasterizationRenderer::RasterizationRenderer(const std::string& script_name, std::string output, int width, int height)
-    : general::Renderer(script_name, output, width, height) {
+    : general::Renderer(script_name, std::move(output), width, height) {
 
 }
 
 void RasterizationRenderer::render() {
+    create();
 
+    int total = _transforms.size();
+    if (total == 0) {
+        return;
+    }
+
+    int finished = 0;
+    for (auto* transform : _transforms) {
+        _current = transform;
+        _current->rasterize(this);
+        ++finished;
+        _process = static_cast<float>(finished) / static_cast<float>(total);
+    }
 }
 
 } // namespace core::rasterization

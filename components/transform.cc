@@ -11,3 +11,24 @@
 /// @file transform.cc
 
 #include "transform.h"
+
+#include "glm/gtc/matrix_transform.hpp"
+#include "core/general/renderer.h"
+
+extern core::general::Renderer* renderer;
+
+namespace components {
+
+Transform::Transform() : _position(), _model(), _scale(1, 1, 1), _rotation() {
+}
+
+void Transform::updateModelMatrix() {
+    _model = glm::mat4(1.0f);
+    _model = glm::rotate(_model, _rotation.x, glm::vec3(1, 0, 0));
+    _model = glm::rotate(_model, _rotation.y, glm::vec3(0, 1, 0));
+    _model = glm::rotate(_model, _rotation.z, glm::vec3(0, 0, 1));
+    _model = glm::scale(_model, _scale);
+    _model = glm::translate(_model, _position);
+}
+
+} // namespace components

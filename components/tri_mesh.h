@@ -14,4 +14,30 @@
 #ifndef SEELE_TRI_MESH_H
 #define SEELE_TRI_MESH_H
 
+#include <string>
+
+#include "transform.h"
+
+namespace objl {
+    class Loader;
+} // namespace objl
+
+namespace components {
+
+class TriMesh : public Transform {
+public:
+    TriMesh(std::string filename, std::string vertex_shader, std::string fragment_shader);
+    ~TriMesh();
+
+    void rasterize(core::rasterization::RasterizationRenderer* renderer) override;
+private:
+    objl::Loader* _object;
+
+    std::string _vertex_shader;
+    std::string _fragment_shader;
+protected:
+};
+
+} // namespace components
+
 #endif //SEELE_TRI_MESH_H
