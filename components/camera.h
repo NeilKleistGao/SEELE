@@ -19,7 +19,18 @@ namespace components {
 
 class Camera : public Transform {
 public:
+    Camera(const glm::vec3& look_from, const glm::vec3& look_at, const glm::vec3& vup, float fov, float width, float height);
+    ~Camera() override;
+
+    glm::vec4 transform(const glm::vec4& vec) override;
+
+    void rasterize(core::rasterization::RasterizationRenderer* renderer) override {}
 private:
+    glm::mat4 _v;
+    glm::mat4 _p;
+    float _focus;
+    float _width;
+    float _height;
 protected:
 };
 

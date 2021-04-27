@@ -27,7 +27,7 @@ namespace components {
 class TriMesh : public Transform {
 public:
     TriMesh(std::string filename, std::string vertex_shader, std::string fragment_shader);
-    ~TriMesh();
+    ~TriMesh() override;
 
     void rasterize(core::rasterization::RasterizationRenderer* renderer) override;
 private:

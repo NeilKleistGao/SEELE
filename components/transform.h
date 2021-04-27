@@ -23,7 +23,7 @@ namespace components {
 class Transform {
 public:
     Transform();
-    ~Transform() = default;
+    virtual ~Transform() = default;
 
     void setPosition(const glm::vec3& position) {
         _position = position;
@@ -49,7 +49,7 @@ public:
         return _scale;
     }
 
-    inline glm::vec4 transform(const glm::vec4& v) {
+    virtual glm::vec4 transform(const glm::vec4& v) {
         return _model * v;
     }
 

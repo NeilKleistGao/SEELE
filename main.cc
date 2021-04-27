@@ -22,20 +22,21 @@
 #include "core/photon/photon_renderer.h"
 
 static core::general::Renderer* render;
-static std::atomic<bool> finished;
+static std::atomic<bool> finished{false};
 
-void monitor() {
+void wait() {
     while (!finished.load()) {
         auto process = render->getProcess() * 100;
         printf("\rRendering[%.2f%%]: ", process);
 
-        for (int i = 0; i <= process; i++) {
+        for (int i = 1; i <= process; i += 5) {
             printf("█");
         }
-        puts("");
+        putchar('\n');
 
         using namespace std::chrono_literals;
         std::this_thread::sleep_for(300ms);
+        std::this_thread::yield();
     }
 }
 
@@ -71,11 +72,12 @@ int main(int argc, char* argv[]) {
             throw std::exception{};
         }
 
-        finished.store(false);
-        std::thread monitor_thread{monitor};
-        render->render();
-        finished.store(true);
-        monitor_thread.join();
+        std::thread render_thread{[](){
+            render->render();
+            finished.store(true);
+        }};
+        wait();
+        render_thread.join();
 
         auto end = std::chrono::system_clock::now();
 
@@ -85,6 +87,9 @@ int main(int argc, char* argv[]) {
 
         delete render;
         render = nullptr;
+    }
+    catch (const std::exception& e) {
+        std::cerr << e.what() << std::endl;
     }
     catch (...) {
         std::cerr << options.help() << std::endl;

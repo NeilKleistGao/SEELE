@@ -22,6 +22,7 @@
 #include "image.h"
 #include "shader.h"
 #include "components/transform.h"
+#include "components/camera.h"
 
 namespace core::general {
 
@@ -29,8 +30,10 @@ class Renderer {
 public:
     Renderer(const std::string& script_name, std::string output, int width, int height);
     virtual ~Renderer();
+    Renderer(const Renderer& other) = delete;
+    Renderer& operator= (const Renderer& other) = delete;
 
-    virtual void render() = 0;
+    virtual void render() {};
 
     inline float getProcess() const {
         return _process;
@@ -40,11 +43,15 @@ public:
         _transforms.push_back(transform);
     }
 
-    inline void setCamera() {}
-
     inline void addLight() {}
 
     Shader* getShader(const std::string& name);
+
+    glm::vec3 transformMVP(const glm::vec3& v);
+
+    inline void setCamera(components::Camera* camera) {
+        _camera = camera;
+    }
 private:
     lua_State* _state;
     std::map<std::string, Shader*> _shaders;
@@ -54,6 +61,7 @@ protected:
     float _process;
     Image* _image;
     components::Transform* _current;
+    components::Camera* _camera;
 
     std::list<components::Transform*> _transforms;
 

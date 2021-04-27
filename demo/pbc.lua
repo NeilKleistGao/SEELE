@@ -8,17 +8,32 @@
 
 --- pbc.lua
 
-SHADER_LIST = {
-    {"vertex", vertex},
-    {"fragment", fragment}
+SHADERS_LIST = {
+    "vertex", "fragment"
 }
 
 function onCreate()
-    print("hello world")
+    pcb = seele.TriMesh("../demo/assets/PCB/PCB.obj", "vertex", "fragment")
+    R:addObject(pcb)
+
+    camera = seele.Camera(
+            seele.vec3(0, 0, 0),
+            seele.vec3(0, 0, -1),
+            seele.vec3(0, 1, 0),
+            90, 1024, 768
+    )
+    R:setCamera(camera)
 end
 
 function vertex(app_data)
+    position = R:transformMVP(app_data[1])
+    return {
+        {3, position, true},
+        {2, app_data[2], true},
+        {3, app_data[3], true}
+    }
 end
 
 function fragment(v2f)
+    return seele.vec3(1, 1, 1)
 end

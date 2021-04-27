@@ -12,6 +12,41 @@
 
 #include "camera.h"
 
+#include <cmath>
+
+#include "glm/gtc/matrix_transform.hpp"
+
 namespace components {
+
+Camera::Camera(const glm::vec3& look_from, const glm::vec3& look_at, const glm::vec3& vup, float fov, float width, float height)
+: Transform(), _width(width), _height(height) {
+    _position = look_from;
+
+    auto theta = fov / 180.0f * 3.1415926535f;
+    _focus = 1 / std::tan(theta / 2);
+
+    _v = glm::mat4 {1.0f};
+    _v = glm::translate(_v, -_position);
+
+    auto x = glm::cross(look_at, vup);
+    auto temp = glm::mat4 {1.0f};
+    temp[0][0] = x.x; temp[0][1] = vup.x; temp[0][2] = -look_at.x;
+    temp[1][0] = x.y; temp[1][1] = vup.y; temp[1][2] = -look_at.y;
+    temp[2][0] = x.z; temp[2][1] = vup.z; temp[2][2] = -look_at.z;
+    _v = temp * _v;
+
+    _p = glm::mat4 {0.0f};
+    _p[0][0] = 2 * _focus / _width;
+    _p[1][1] = 2 * _focus / _height;
+    _p[2][2] = _p[2][3] = -1;
+    _p[3][2] = -2 * _focus;
+}
+
+Camera::~Camera() = default;
+
+glm::vec4 Camera::transform(const glm::vec4& vec) {
+    auto temp =  _p * _v * vec;
+    return {temp.x * (_width / 2.0f), temp.y * (_height / 2.0f), temp.z, temp.w};
+}
 
 } // namespace components

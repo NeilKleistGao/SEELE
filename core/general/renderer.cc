@@ -14,10 +14,15 @@
 
 #include <iostream>
 
+#include "glm/glm.hpp"
+#include "components/transform.h"
+#include "components/tri_mesh.h"
+#include "components/camera.h"
+
 namespace core::general {
 
 Renderer::Renderer(const std::string& script_name, std::string output, int width, int height)
-    : _process(0.0f), _image(new Image{std::move(output), width, height}){
+    : _process(0.0f), _image(new Image{std::move(output), width, height}), _current(nullptr), _state(nullptr) {
     _state = luaL_newstate();
     luaL_openlibs(_state);
 
@@ -26,6 +31,8 @@ Renderer::Renderer(const std::string& script_name, std::string output, int width
         std::cerr << "can't open file " << script_name << std::endl;
         exit(-1);
     }
+
+    registerComponents();
 }
 
 Renderer::~Renderer() {
@@ -34,18 +41,65 @@ Renderer::~Renderer() {
 }
 
 void Renderer::registerComponents() {
-    // TODO:
+    using namespace glm;
+    using namespace components;
+
+    luabridge::getGlobalNamespace(_state).beginNamespace("seele")
+        .beginClass<vec2>("vec2")
+            .addConstructor<void (*) (float, float)>()
+            .addProperty("x", &vec2::x)
+            .addProperty("y", &vec2::y)
+        .endClass()
+
+        .beginClass<vec3>("vec3")
+            .addConstructor<void (*) (float, float, float)>()
+            .addProperty("x", &vec3::x)
+            .addProperty("y", &vec3::y)
+            .addProperty("z", &vec3::z)
+        .endClass()
+
+        .beginClass<vec4>("vec4")
+            .addConstructor<void (*) (float, float, float, float)>()
+            .addProperty("x", &vec4::x)
+            .addProperty("y", &vec4::y)
+            .addProperty("z", &vec4::z)
+            .addProperty("w", &vec4::w)
+        .endClass()
+
+        .beginClass<Renderer>("Renderer")
+            .addFunction("addObject", &Renderer::addObject)
+            .addFunction("setCamera", &Renderer::setCamera)
+            .addFunction("transformMVP", &Renderer::transformMVP)
+        .endClass()
+
+        .beginClass<Transform>("Transform")
+            .addFunction("setPosition", &Transform::setPosition)
+            .addFunction("setRotation", &Transform::setRotation)
+            .addFunction("setScale", &Transform::setScale)
+            .addFunction("getPosition", &Transform::getPosition)
+            .addFunction("getRotation", &Transform::getRotation)
+            .addFunction("getScale", &Transform::getScale)
+        .endClass()
+
+        .deriveClass<Camera, Transform>("Camera")
+            .addConstructor<void (*) (const glm::vec3&, const glm::vec3&, const glm::vec3&, float, float, float)>()
+        .endClass()
+
+        .deriveClass<TriMesh, Transform>("TriMesh")
+            .addConstructor<void (*) (std::string, std::string, std::string)>()
+        .endClass()
+    .endNamespace();
+
+    luabridge::setGlobal(_state, this, "R");
 }
 
 void Renderer::create() {
     auto list = luabridge::getGlobal(_state, "SHADERS_LIST");
     if (list.isTable()) {
         int size = list.length();
-        for (int i = 1; i < size; ++i) {
-            auto item = list[i];
-            auto name = item[1].cast<std::string>();
-            auto func = item[2];
-            _shaders[name] = func;
+        for (int i = 1; i <= size; ++i) {
+            auto name = list[i].cast<std::string>();
+            _shaders[name] = new Shader(_state, name);
         }
     }
 
@@ -63,6 +117,19 @@ Shader* Renderer::getShader(const std::string& name) {
     }
 
     return _shaders[name];
+}
+
+glm::vec3 Renderer::transformMVP(const glm::vec3& v) {
+    auto v4 = glm::vec4{v.x, v.y, v.z, 1};
+    if (_current != nullptr) {
+        v4 = _current->transform(v4);
+    }
+
+    if (_camera != nullptr) {
+        v4 = _camera->transform(v4);
+    }
+
+    return glm::vec3 {v4.x, v4.y, v4.z};
 }
 
 } // namespace core::general

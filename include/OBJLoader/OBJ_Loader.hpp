@@ -733,6 +733,10 @@ namespace objl
             algorithm::split(algorithm::tail(icurline), sface, " ");
             bool noNormal = false;
 
+            if (*sface.rbegin() == "\r") {
+                sface.pop_back();
+            }
+
             // For every given vertex do this
             for (int i = 0; i < int(sface.size()); i++)
             {
