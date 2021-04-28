@@ -17,9 +17,10 @@
 #include <string>
 
 #include "transform.h"
+#include "core/general/shader.h"
 
 namespace objl {
-    class Loader;
+class Loader;
 } // namespace objl
 
 namespace components {
@@ -31,10 +32,20 @@ public:
 
     void rasterize(core::rasterization::RasterizationRenderer* renderer) override;
 private:
+    using ShaderDataItem = core::general::Shader::ShaderDataItem;
+    using ShaderDataList = std::vector<ShaderDataItem>;
     objl::Loader* _object;
 
     std::string _vertex_shader;
     std::string _fragment_shader;
+
+    static bool isInTriangle(const glm::vec2& v1, const glm::vec2& v2, const glm::vec2& v3, const glm::vec2& point);
+    static ShaderDataList interpolate(
+            const ShaderDataList& v1,
+            const ShaderDataList& v2,
+            const ShaderDataList& v3,
+            float alpha, float beta, float gamma
+            );
 protected:
 };
 

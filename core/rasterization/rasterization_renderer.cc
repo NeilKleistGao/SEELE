@@ -13,12 +13,21 @@
 #include "rasterization_renderer.h"
 
 #include <utility>
+#include <limits>
 
 namespace core::rasterization {
 
 RasterizationRenderer::RasterizationRenderer(const std::string& script_name, std::string output, int width, int height)
     : general::Renderer(script_name, std::move(output), width, height) {
+    _z_buffer = new float[width * height];
+    for (int i = 0; i < width * height; ++i) {
+        _z_buffer[i] = std::numeric_limits<float>::lowest();
+    }
+}
 
+RasterizationRenderer::~RasterizationRenderer() {
+    delete [] _z_buffer;
+    _z_buffer = nullptr;
 }
 
 void RasterizationRenderer::render() {
@@ -35,6 +44,15 @@ void RasterizationRenderer::render() {
         _current->rasterize(this);
         ++finished;
         _process = static_cast<float>(finished) / static_cast<float>(total);
+    }
+}
+
+void RasterizationRenderer::putPixel(const glm::vec3& pos, const glm::vec3& color) {
+    int x = pos.x + _width / 2, y = pos.y + _height / 2;
+    int index = y * _width + x;
+    if (index < _width * _height && _z_buffer[index] <= pos.z) {
+        _image->putPixel(x, y, color.r, color.g, color.b);
+        _z_buffer[index] = pos.z;
     }
 }
 

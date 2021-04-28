@@ -22,7 +22,8 @@
 namespace core::general {
 
 Renderer::Renderer(const std::string& script_name, std::string output, int width, int height)
-    : _process(0.0f), _image(new Image{std::move(output), width, height}), _current(nullptr), _state(nullptr) {
+    : _process(0.0f), _image(new Image{std::move(output), width, height}),
+    _current(nullptr), _state(nullptr), _width(width), _height(height) {
     _state = luaL_newstate();
     luaL_openlibs(_state);
 

@@ -20,8 +20,12 @@ namespace core::rasterization {
 class RasterizationRenderer : public general::Renderer {
 public:
     RasterizationRenderer(const std::string& script_name, std::string output, int width, int height);
+    ~RasterizationRenderer() override;
     void render() override;
+
+    void putPixel(const glm::vec3& pos, const glm::vec3& color);
 private:
+    float* _z_buffer;
 protected:
 };
 

@@ -13,9 +13,6 @@
 #include "transform.h"
 
 #include "glm/gtc/matrix_transform.hpp"
-#include "core/general/renderer.h"
-
-extern core::general::Renderer* renderer;
 
 namespace components {
 
@@ -27,8 +24,8 @@ void Transform::updateModelMatrix() {
     _model = glm::rotate(_model, _rotation.x, glm::vec3(1, 0, 0));
     _model = glm::rotate(_model, _rotation.y, glm::vec3(0, 1, 0));
     _model = glm::rotate(_model, _rotation.z, glm::vec3(0, 0, 1));
-    _model = glm::scale(_model, _scale);
     _model = glm::translate(_model, _position);
+    _model = glm::scale(_model, _scale);
 }
 
 } // namespace components

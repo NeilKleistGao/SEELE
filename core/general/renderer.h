@@ -62,6 +62,8 @@ protected:
     Image* _image;
     components::Transform* _current;
     components::Camera* _camera;
+    int _width;
+    int _height;
 
     std::list<components::Transform*> _transforms;
 
