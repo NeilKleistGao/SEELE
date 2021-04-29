@@ -48,9 +48,9 @@ void RasterizationRenderer::render() {
 }
 
 void RasterizationRenderer::putPixel(const glm::vec3& pos, const glm::vec3& color) {
-    int x = pos.x + _width / 2, y = pos.y + _height / 2;
+    int x = static_cast<int>(std::round(pos.x)) + _width / 2, y = static_cast<int>(std::round(pos.y)) + _height / 2;
     int index = y * _width + x;
-    if (index < _width * _height && _z_buffer[index] <= pos.z) {
+    if (index > -1 && index < _width * _height && _z_buffer[index] <= pos.z) {
         _image->putPixel(x, y, color.r, color.g, color.b);
         _z_buffer[index] = pos.z;
     }

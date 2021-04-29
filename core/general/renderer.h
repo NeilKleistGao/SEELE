@@ -23,6 +23,7 @@
 #include "shader.h"
 #include "components/transform.h"
 #include "components/camera.h"
+#include "assets/texture.h"
 
 namespace core::general {
 
@@ -52,9 +53,16 @@ public:
     inline void setCamera(components::Camera* camera) {
         _camera = camera;
     }
+
+    inline void setTexture(assets::Texture* texture) {
+        _texture = texture;
+    }
+
+    glm::vec3 getTextureColor(float x, float y);
 private:
     lua_State* _state;
     std::map<std::string, Shader*> _shaders;
+    assets::Texture* _texture;
 
     void registerComponents();
 protected:

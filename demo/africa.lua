@@ -16,13 +16,12 @@ function onCreate()
     head = seele.TriMesh("../demo/assets/Africa/african_head.obj", "vertex", "fragment")
     head:setScale(seele.vec3(300, 300, 300))
     head:setPosition(seele.vec3(0, 0, -400))
-    head:setRotation(seele.vec3(0, 0, 3.14))
     R:addObject(head)
 
     camera = seele.Camera(
             seele.vec3(0, 0, 0),
             seele.vec3(0, 0, -1),
-            seele.vec3(0, 1, 0),
+            seele.vec3(0, -1, 0),
             90, 1024, 768
     )
     R:setCamera(camera)
@@ -38,5 +37,5 @@ function vertex(app_data)
 end
 
 function fragment(v2f)
-    return seele.vec3(255, 255, 255)
+    return R:getTextureColor(v2f[2].x, v2f[2].y)
 end

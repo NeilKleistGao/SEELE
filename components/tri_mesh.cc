@@ -29,6 +29,8 @@
 #include "tri_mesh.h"
 
 #include <utility>
+#include <filesystem>
+#include <string>
 
 #include "include/OBJLoader/OBJ_Loader.hpp"
 #include "core/rasterization/rasterization_renderer.h"
@@ -41,6 +43,11 @@ TriMesh::TriMesh(std::string filename, std::string vertex_shader, std::string fr
           _vertex_shader(std::move(vertex_shader)) {
     _object = new objl::Loader();
     _object->LoadFile(std::move(filename));
+
+    for (const auto& mat : _object->LoadedMaterials) {
+        std::filesystem::path p {filename};
+        _textures[mat.map_Kd] = new assets::Texture(p.parent_path().string() + "/" + mat.map_Kd);
+    }
 }
 
 TriMesh::~TriMesh() {
@@ -56,6 +63,7 @@ void TriMesh::rasterize(core::rasterization::RasterizationRenderer* renderer) {
     auto f_shader = renderer->getShader(_fragment_shader);
 
     for (auto& mesh : _object->LoadedMeshes) {
+        renderer->setTexture(_textures[mesh.MeshMaterial->map_Kd]);
         for (int i = 0; i < mesh.Vertices.size(); i += 3) {
             ShaderDataList v2f[3];
             for (int j = 0; j < 3; ++j) {
@@ -82,18 +90,19 @@ void TriMesh::rasterize(core::rasterization::RasterizationRenderer* renderer) {
             int max_x = std::max(std::max(v1.x, v2.x), v3.x);
             int max_y = std::max(std::max(v1.y, v2.y), v3.y);
 
-            for (int i = min_x; i <= max_x; ++i) {
-                for (int j = min_y; j <= max_y; ++j) {
-                    float alpha = ((i - v3.x)*(v1.y - v3.y) - (v1.x - v3.x)*(j - v3.y)) /
-                                  ((v2.x - v3.x)*(v1.y - v3.y) - (v1.x - v3.x)*(v2.y - v3.y)),
-                            beta = ((j - v3.y)*(v1.x - v3.x) - (v1.y - v3.y)*(i - v3.x)) /
-                                   ((v2.y - v3.y)*(v1.x - v3.x) - (v1.y - v3.y)*(v2.x - v3.x)),
-                            gamma = 1 - alpha - beta;
-                    if (alpha >= 0.0f && alpha <= 1.0f && beta >= 0.0f && beta <= 1.0f && gamma >= 0.0f && gamma <= 1.0f) {
+            for (int j = min_x; j <= max_x; ++j) {
+                for (int k = min_y; k <= max_y; ++k) {
+                    if (isInTriangle(v1, v2, v3, {j, k})) {
+                        float u = (-(j - v2.x) * (v3.y - v2.y) + (k - v2.y) * (v3.x - v2.x))
+                                  / (-(v1.x - v2.x) * (v3.y - v2.y) + (v1.y - v2.y) * (v3.x - v2.x)),
+                                v = (-(j - v3.x) * (v1.y - v3.y) + (k - v3.y) * (v1.x - v3.x))
+                                    / (-(v2.x - v3.x) * (v1.y - v3.y) + (v2.y - v3.y) * (v1.x - v3.x)),
+                                w = 1.0f - u - v;
+
                         auto f_data = interpolate(v2f[0], v2f[1], v2f[2],
-                                                  alpha, beta, gamma);
+                                                  w, u, v);
                         auto color = f_shader->onFragment(f_data);
-                        renderer->putPixel(f_data[0].vec3, color);
+                        renderer->putPixel({j, k, f_data[0].vec3.z}, color);
                     }
                 }
             }
@@ -102,15 +111,15 @@ void TriMesh::rasterize(core::rasterization::RasterizationRenderer* renderer) {
 }
 
 bool TriMesh::isInTriangle(const glm::vec2& v1, const glm::vec2& v2, const glm::vec2& v3, const glm::vec2& point) {
-    auto e1 = v1 - v3, t1 = point - v3;
-    auto e2 = v2 - v1, t2 = point - v1;
-    auto e3 = v3 - v2, t3 = point - v2;
+    auto e1 = v1 - point;
+    auto e2 = v2 - point;
+    auto e3 = v3 - point;
 
-    auto c1 = e1.x * t1.y - e1.y * t1.x;
-    auto c2 = e2.x * t2.y - e2.y * t2.x;
-    auto c3 = e3.x * t3.y - e3.y * t3.x;
+    auto c1 = e1.x * e2.y - e1.y * e2.x;
+    auto c2 = e2.x * e3.y - e2.y * e3.x;
+    auto c3 = e3.x * e1.y - e3.y * e1.x;
 
-    return (c1 >= 0.0f && c2 >= 0.0f && c3 >= 0.0f) || (c1 <= 0.0f && c2 <= 0.0f && c3 <= 0.0f);
+    return (c1 >= -1e-8 && c2 >= -1e-8 && c3 >= -1e-8) || (c1 <= 1e-8 && c2 <= 1e-8 && c3 <= 1e-8);
 }
 
 TriMesh::ShaderDataList TriMesh::interpolate(

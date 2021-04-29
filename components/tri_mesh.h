@@ -15,9 +15,11 @@
 #define SEELE_TRI_MESH_H
 
 #include <string>
+#include <map>
 
 #include "transform.h"
 #include "core/general/shader.h"
+#include "assets/texture.h"
 
 namespace objl {
 class Loader;
@@ -38,6 +40,8 @@ private:
 
     std::string _vertex_shader;
     std::string _fragment_shader;
+
+    std::map<std::string, assets::Texture*> _textures;
 
     static bool isInTriangle(const glm::vec2& v1, const glm::vec2& v2, const glm::vec2& v3, const glm::vec2& point);
     static ShaderDataList interpolate(

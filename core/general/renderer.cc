@@ -23,7 +23,7 @@ namespace core::general {
 
 Renderer::Renderer(const std::string& script_name, std::string output, int width, int height)
     : _process(0.0f), _image(new Image{std::move(output), width, height}),
-    _current(nullptr), _state(nullptr), _width(width), _height(height) {
+    _current(nullptr), _state(nullptr), _texture(nullptr), _width(width), _height(height) {
     _state = luaL_newstate();
     luaL_openlibs(_state);
 
@@ -71,6 +71,7 @@ void Renderer::registerComponents() {
             .addFunction("addObject", &Renderer::addObject)
             .addFunction("setCamera", &Renderer::setCamera)
             .addFunction("transformMVP", &Renderer::transformMVP)
+            .addFunction("getTextureColor", &Renderer::getTextureColor)
         .endClass()
 
         .beginClass<Transform>("Transform")
@@ -131,6 +132,14 @@ glm::vec3 Renderer::transformMVP(const glm::vec3& v) {
     }
 
     return glm::vec3 {v4.x, v4.y, v4.z};
+}
+
+glm::vec3 Renderer::getTextureColor(float x, float y) {
+    if (_texture == nullptr) {
+        return {};
+    }
+
+    return _texture->getColor(x, y);
 }
 
 } // namespace core::general
