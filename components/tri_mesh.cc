@@ -41,11 +41,11 @@ TriMesh::TriMesh(std::string filename, std::string vertex_shader, std::string fr
         : Transform(), _object(nullptr),
           _fragment_shader(std::move(fragment_shader)),
           _vertex_shader(std::move(vertex_shader)) {
+    std::filesystem::path p = std::move(filename);
     _object = new objl::Loader();
-    _object->LoadFile(std::move(filename));
+    _object->LoadFile(p.string());
 
     for (const auto& mat : _object->LoadedMaterials) {
-        std::filesystem::path p {filename};
         _textures[mat.map_Kd] = new assets::Texture(p.parent_path().string() + "/" + mat.map_Kd);
     }
 }
@@ -100,7 +100,7 @@ void TriMesh::rasterize(core::rasterization::RasterizationRenderer* renderer) {
                                 w = 1.0f - u - v;
 
                         auto f_data = interpolate(v2f[0], v2f[1], v2f[2],
-                                                  w, u, v);
+                                                  u, v, w);
                         auto color = f_shader->onFragment(f_data);
                         renderer->putPixel({j, k, f_data[0].vec3.z}, color);
                     }

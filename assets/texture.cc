@@ -20,6 +20,7 @@
 namespace assets {
 
 Texture::Texture(const std::string& filename) : _channel(), _height(), _width(), _image(nullptr) {
+    stbi_set_flip_vertically_on_load(true);
     _image = stbi_load(filename.c_str(), &_width, &_height, &_channel, 0);
 }
 
@@ -29,16 +30,12 @@ Texture::~Texture() {
 }
 
 glm::vec4 Texture::getColor(float x, float y) const {
-    x = std::min(x, 1.0f);
-    x = std::max(0.0f, x);
-    y = std::min(y, 1.0f);
-    y = std::max(0.0f, y);
-
-    int ix = x * _width, iy = y * _height;
-    int index = iy * _width + ix * _channel;
+    int ix = glm::clamp<int>(x * _width, 0, _width - 1),
+            iy = glm::clamp<int>(y * _height, 0, _height - 1);
+    int index = (iy * _width + ix) * _channel;
 
     if (_channel == 3) {
-        return glm::vec4 {_image[index], _image[index + 1], _image[index + 2], 0};
+        return glm::vec4 {_image[index], _image[index + 1], _image[index + 2], 255};
     }
     else if (_channel == 4) {
         return glm::vec4 {_image[index], _image[index + 1], _image[index + 2], _image[index + 3]};

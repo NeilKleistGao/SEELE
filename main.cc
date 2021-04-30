@@ -48,7 +48,7 @@ int main(int argc, char* argv[]) {
     ("m,method", "Rendering Method", cxxopts::value<std::string>()->default_value("rasterization"))
     ("w,width", "Image Width", cxxopts::value<int>()->default_value("1024"))
     ("h,height", "Image Height", cxxopts::value<int>()->default_value("768"))
-    ("f,filename", "Output Filename", cxxopts::value<std::string>()->default_value("output.jpg"));
+    ("f,filename", "Output Filename", cxxopts::value<std::string>()->default_value("output.png"));
 
     try {
         auto result = options.parse(argc, argv);

@@ -14,6 +14,7 @@ SHADERS_LIST = {
 
 function onCreate()
     head = seele.TriMesh("../demo/assets/Africa/african_head.obj", "vertex", "fragment")
+    head:setRotation(seele.vec3(0, 180, 0))
     head:setScale(seele.vec3(300, 300, 300))
     head:setPosition(seele.vec3(0, 0, -400))
     R:addObject(head)
@@ -37,5 +38,6 @@ function vertex(app_data)
 end
 
 function fragment(v2f)
-    return R:getTextureColor(v2f[2].x, v2f[2].y)
+    color = R:getTextureColor(v2f[2].x, v2f[2].y)
+    return seele.vec3(color.x, color.y, color.z)
 end

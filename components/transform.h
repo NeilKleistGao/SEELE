@@ -30,7 +30,7 @@ public:
     }
 
     inline void setRotation(const glm::vec3& rotation) {
-        _rotation = rotation;
+        _rotation = rotation / 180.0f * 3.1415926535f;
     }
 
     inline void setScale(const glm::vec3& scale) {

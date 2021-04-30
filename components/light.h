@@ -8,30 +8,31 @@
  * it applies also to any other work released this way by its authors. You can apply it to your programs, too.
  */
 
-/// @file image.cc
+/// @file light.h
 
-#include "image.h"
+#ifndef SEELE_LIGHT_H
+#define SEELE_LIGHT_H
 
-#include <utility>
+#include "transform.h"
 
-#define STB_IMAGE_WRITE_IMPLEMENTATION
-#include "include/stb/stb_image_write.h"
+namespace components {
 
-namespace core::general {
+class Light : public Transform {
+public:
+    Light() = default;
+    ~Light() override = default;
 
-Image::Image(std::string filename, int width, int height)
-    : _filename(std::move(filename)), _width(width), _height(height) {
-    _buffer = new unsigned char[_width * _height * CHANNEL_SIZE];
-}
+    struct LightData {
+        glm::vec3 direction;
+        glm::vec3 color;
+    };
 
-Image::~Image() {
-    this->flush();
-    delete [] _buffer;
-    _buffer = nullptr;
-}
+    virtual LightData getLightData(const glm::vec3& pos) = 0;
+    void rasterize(core::rasterization::RasterizationRenderer* renderer) override {}
+private:
+protected:
+};
 
-void Image::flush() {
-    stbi_write_png(_filename.c_str(), _width, _height, CHANNEL_SIZE, _buffer, 0);
-}
+} // namespace components
 
-} // namespace core::general
+#endif //SEELE_LIGHT_H
