@@ -38,6 +38,6 @@ function vertex(app_data)
 end
 
 function fragment(v2f)
-    color = R:getTextureColor(v2f[2].x, v2f[2].y)
+    color = R:getTextureColor(0, v2f[2].x, v2f[2].y)
     return seele.vec3(color.x, color.y, color.z)
 end

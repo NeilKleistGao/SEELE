@@ -53,9 +53,14 @@ public:
         return _model * v;
     }
 
+    inline glm::vec4 transformNormal(const glm::vec4& n) {
+        return _rt_model * n;
+    }
+
     virtual void rasterize(core::rasterization::RasterizationRenderer* renderer) = 0;
 private:
     glm::mat4 _model;
+    glm::mat4 _rt_model;
 protected:
     glm::vec3 _position;
     glm::vec3 _rotation;

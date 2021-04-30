@@ -40,6 +40,22 @@ Camera::Camera(const glm::vec3& look_from, const glm::vec3& look_at, const glm::
     _p[1][1] = 2 * _focus / _height;
     _p[2][2] = _p[2][3] = -1;
     _p[3][2] = -2 * _focus;
+
+    _rtv = glm::mat4 {1.0f};
+    _rtv = glm::translate(_rtv, _position);
+    temp = glm::mat4 {1.0f};
+    temp[0][0] = 1.0f / x.x; temp[0][1] = 1.0f / x.y; temp[0][2] = 1.0f / x.z;
+    temp[1][0] = 1.0f / vup.x; temp[1][1] = 1.0f / vup.y; temp[1][2] = 1.0f / vup.z;
+    temp[2][0] = -1.0f / look_at.x; temp[2][1] = -1.0f / look_at.y; temp[2][2] = -1.0f / look_at.z;
+    _rtv = _rtv * temp;
+    _rtv = glm::transpose(_rtv);
+
+    _rtp = glm::mat4 {0.0f};
+    _rtp[0][0] = _width / (2 * _focus);
+    _rtp[1][1] = _height / (2 * _focus);
+    _rtp[3][2] = -1;
+    _rtp[2][3] = -1 / (2 * _focus);
+    _rtp[3][3] = 1 / (2 * _focus);
 }
 
 Camera::~Camera() = default;

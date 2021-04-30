@@ -24,6 +24,7 @@
 #include "components/transform.h"
 #include "components/camera.h"
 #include "assets/texture.h"
+#include "components/light.h"
 
 namespace core::general {
 
@@ -44,8 +45,6 @@ public:
         _transforms.push_back(transform);
     }
 
-    inline void addLight() {}
-
     Shader* getShader(const std::string& name);
 
     glm::vec3 transformMVP(const glm::vec3& v);
@@ -54,15 +53,23 @@ public:
         _camera = camera;
     }
 
-    inline void setTexture(assets::Texture* texture) {
-        _texture = texture;
+    inline void setTexture(int i, assets::Texture* texture) {
+        _textures[i] = texture;
     }
 
-    glm::vec3 getTextureColor(float x, float y);
+    glm::vec3 getTextureColor(int i, float x, float y);
+
+    inline void addLight(components::Light* light) {
+        _lights.push_back(light);
+    }
+
+    glm::vec3 transformNormal(const glm::vec3& n);
 private:
+    constexpr static int TEXTURE_COUNT = 8;
+
     lua_State* _state;
     std::map<std::string, Shader*> _shaders;
-    assets::Texture* _texture;
+    assets::Texture* _textures[TEXTURE_COUNT];
 
     void registerComponents();
 protected:
@@ -74,6 +81,7 @@ protected:
     int _height;
 
     std::list<components::Transform*> _transforms;
+    std::list<components::Light*> _lights;
 
     void create();
 };

@@ -8,38 +8,21 @@
  * it applies also to any other work released this way by its authors. You can apply it to your programs, too.
  */
 
-/// @file camera.h
+/// @file directional_light.cc
 
-#ifndef SEELE_CAMERA_H
-#define SEELE_CAMERA_H
-
-#include "transform.h"
+#include "directional_light.h"
 
 namespace components {
 
-class Camera : public Transform {
-public:
-    Camera(const glm::vec3& look_from, const glm::vec3& look_at, const glm::vec3& vup, float fov, float width, float height);
-    ~Camera() override;
+DirectionalLight::DirectionalLight(const glm::vec3& direction, const glm::vec3& color)
+: _direction(direction), _color(color) {
+}
 
-    glm::vec4 transform(const glm::vec4& vec) override;
-
-    inline glm::vec4 transformNormal(const glm::vec4& n) const {
-        return _rtp * _rtv * n;
-    }
-
-    void rasterize(core::rasterization::RasterizationRenderer* renderer) override {}
-private:
-    glm::mat4 _v;
-    glm::mat4 _p;
-    glm::mat4 _rtv;
-    glm::mat4 _rtp;
-    float _focus;
-    float _width;
-    float _height;
-protected:
-};
+Light::LightData DirectionalLight::getLightData(const glm::vec3& pos) {
+    LightData data{};
+    data.color = _color;
+    data.direction = _direction;
+    return data;
+}
 
 } // namespace components
-
-#endif //SEELE_CAMERA_H

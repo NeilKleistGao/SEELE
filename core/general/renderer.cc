@@ -23,9 +23,12 @@ namespace core::general {
 
 Renderer::Renderer(const std::string& script_name, std::string output, int width, int height)
     : _process(0.0f), _image(new Image{std::move(output), width, height}),
-    _current(nullptr), _state(nullptr), _texture(nullptr), _width(width), _height(height) {
+    _current(nullptr), _state(nullptr), _width(width), _height(height), _camera(nullptr) {
     _state = luaL_newstate();
     luaL_openlibs(_state);
+
+    _textures[0] = _textures[1] = _textures[2] = _textures[3] = nullptr;
+    _textures[4] = _textures[5] = _textures[6] = _textures[7] = nullptr;
 
     auto res = luaL_dofile(_state, script_name.c_str());
     if (res) {
@@ -134,12 +137,25 @@ glm::vec3 Renderer::transformMVP(const glm::vec3& v) {
     return glm::vec3 {v4.x, v4.y, v4.z};
 }
 
-glm::vec3 Renderer::getTextureColor(float x, float y) {
-    if (_texture == nullptr) {
+glm::vec3 Renderer::getTextureColor(int i, float x, float y) {
+    if (_textures[i] == nullptr) {
         return {};
     }
 
-    return _texture->getColor(x, y);
+    return _textures[i]->getColor(x, y);
+}
+
+glm::vec3 Renderer::transformNormal(const glm::vec3& n) {
+    auto n4 = glm::vec4{n.x, n.y, n.z, 0};
+    if (_current != nullptr) {
+        n4 = _current->transformNormal(n4);
+    }
+
+    if (_camera != nullptr) {
+        n4 = _camera->transformNormal(n4);
+    }
+
+    return glm::vec3 {n4.x, n4.y, n4.z};
 }
 
 } // namespace core::general

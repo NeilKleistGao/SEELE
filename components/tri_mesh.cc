@@ -63,7 +63,7 @@ void TriMesh::rasterize(core::rasterization::RasterizationRenderer* renderer) {
     auto f_shader = renderer->getShader(_fragment_shader);
 
     for (auto& mesh : _object->LoadedMeshes) {
-        renderer->setTexture(_textures[mesh.MeshMaterial->map_Kd]);
+        renderer->setTexture(0, _textures[mesh.MeshMaterial->map_Kd]);
         for (int i = 0; i < mesh.Vertices.size(); i += 3) {
             ShaderDataList v2f[3];
             for (int j = 0; j < 3; ++j) {

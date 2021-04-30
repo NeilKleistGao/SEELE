@@ -26,6 +26,14 @@ void Transform::updateModelMatrix() {
     _model = glm::rotate(_model, _rotation.z, glm::vec3(0, 0, 1));
     _model = glm::translate(_model, _position);
     _model = glm::scale(_model, _scale);
+
+    _rt_model = glm::mat4(1.0f);
+    _rt_model = glm::rotate(_rt_model, -_rotation.x, glm::vec3(1, 0, 0));
+    _rt_model = glm::rotate(_rt_model, -_rotation.y, glm::vec3(0, 1, 0));
+    _rt_model = glm::rotate(_rt_model, -_rotation.z, glm::vec3(0, 0, 1));
+    _rt_model = glm::translate(_rt_model, -_position);
+    _rt_model = glm::scale(_rt_model, {1.0f / _scale.x, 1.0f / _scale.y, 1.0f / _scale.z});
+    _rt_model = glm::transpose(_rt_model);
 }
 
 } // namespace components
