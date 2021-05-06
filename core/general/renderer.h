@@ -25,6 +25,7 @@
 #include "components/camera.h"
 #include "assets/texture.h"
 #include "components/light.h"
+#include "assets/material.h"
 
 namespace core::general {
 
@@ -61,15 +62,27 @@ public:
 
     inline void addLight(components::Light* light) {
         _lights.push_back(light);
+        _light_it = _lights.begin();
     }
 
     glm::vec3 transformNormal(const glm::vec3& n);
+
+    components::Light::LightData fetchLight(const glm::vec3& pos);
+
+    inline void setMaterial(assets::Material material) {
+        _material = material;
+    }
+
+    inline assets::Material getMaterial() const {
+        return _material;
+    }
 private:
     constexpr static int TEXTURE_COUNT = 8;
 
     lua_State* _state;
     std::map<std::string, Shader*> _shaders;
     assets::Texture* _textures[TEXTURE_COUNT];
+    assets::Material _material;
 
     void registerComponents();
 protected:
@@ -82,6 +95,8 @@ protected:
 
     std::list<components::Transform*> _transforms;
     std::list<components::Light*> _lights;
+
+    std::list<components::Light*>::iterator _light_it;
 
     void create();
 };

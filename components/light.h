@@ -19,12 +19,14 @@ namespace components {
 
 class Light : public Transform {
 public:
-    Light() = default;
+    Light() : Transform() {}
     ~Light() override = default;
 
     struct LightData {
         glm::vec3 direction;
         glm::vec3 color;
+
+        LightData() : direction(0, 0, 0), color(0, 0, 0) {}
     };
 
     virtual LightData getLightData(const glm::vec3& pos) = 0;

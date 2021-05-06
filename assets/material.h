@@ -8,21 +8,26 @@
  * it applies also to any other work released this way by its authors. You can apply it to your programs, too.
  */
 
-/// @file directional_light.cc
+/// @file material.h
 
-#include "directional_light.h"
+#ifndef SEELE_MATERIAL_H
+#define SEELE_MATERIAL_H
 
-namespace components {
+#include "glm/glm.hpp"
 
-DirectionalLight::DirectionalLight(const glm::vec3& direction, const glm::vec3& color)
-: Light(), _direction(direction), _color(color) {
-}
+namespace assets {
 
-Light::LightData DirectionalLight::getLightData(const glm::vec3& pos) {
-    LightData data{};
-    data.color = _color;
-    data.direction = -_direction;
-    return data;
-}
+struct Material {
+    glm::vec3 Ka;
+    glm::vec3 Kd;
+    glm::vec3 Ks;
 
-} // namespace components
+    Material() = default;
+
+    Material(const glm::vec3& ka, const glm::vec3& kd, const glm::vec3& ks)
+    : Ka(ka), Kd(kd), Ks(ks) {}
+};
+
+} // namespace assets
+
+#endif //SEELE_MATERIAL_H

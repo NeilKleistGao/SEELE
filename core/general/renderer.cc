@@ -18,6 +18,7 @@
 #include "components/transform.h"
 #include "components/tri_mesh.h"
 #include "components/camera.h"
+#include "components/directional_light.h"
 
 namespace core::general {
 
@@ -37,6 +38,8 @@ Renderer::Renderer(const std::string& script_name, std::string output, int width
     }
 
     registerComponents();
+
+    _light_it = _lights.begin();
 }
 
 Renderer::~Renderer() {
@@ -47,6 +50,7 @@ Renderer::~Renderer() {
 void Renderer::registerComponents() {
     using namespace glm;
     using namespace components;
+    using namespace assets;
 
     luabridge::getGlobalNamespace(_state).beginNamespace("seele")
         .beginClass<vec2>("vec2")
@@ -70,11 +74,21 @@ void Renderer::registerComponents() {
             .addProperty("w", &vec4::w)
         .endClass()
 
+        .beginClass<Material>("Material")
+            .addProperty("Kd", &Material::Kd, false)
+            .addProperty("Ka", &Material::Ka, false)
+            .addProperty("Ks", &Material::Ks, false)
+        .endClass()
+
         .beginClass<Renderer>("Renderer")
             .addFunction("addObject", &Renderer::addObject)
             .addFunction("setCamera", &Renderer::setCamera)
             .addFunction("transformMVP", &Renderer::transformMVP)
             .addFunction("getTextureColor", &Renderer::getTextureColor)
+            .addFunction("addLight", &Renderer::addLight)
+            .addFunction("transformNormal", &Renderer::transformNormal)
+            .addFunction("getMaterial", &Renderer::getMaterial)
+            .addFunction("fetchLight", &Renderer::fetchLight)
         .endClass()
 
         .beginClass<Transform>("Transform")
@@ -86,12 +100,25 @@ void Renderer::registerComponents() {
             .addFunction("getScale", &Transform::getScale)
         .endClass()
 
+        .beginClass<Light::LightData>("LightData")
+            .addProperty("direction", &Light::LightData::direction)
+            .addProperty("color", &Light::LightData::color)
+        .endClass()
+
         .deriveClass<Camera, Transform>("Camera")
             .addConstructor<void (*) (const glm::vec3&, const glm::vec3&, const glm::vec3&, float, float, float)>()
         .endClass()
 
         .deriveClass<TriMesh, Transform>("TriMesh")
             .addConstructor<void (*) (std::string, std::string, std::string)>()
+        .endClass()
+
+        .deriveClass<Light, Transform>("Light")
+            .addFunction("getLightData", &Light::getLightData)
+        .endClass()
+
+        .deriveClass<DirectionalLight, Light>("DirectionalLight")
+            .addConstructor<void (*) (const glm::vec3&, const glm::vec3&)>()
         .endClass()
     .endNamespace();
 
@@ -155,7 +182,19 @@ glm::vec3 Renderer::transformNormal(const glm::vec3& n) {
         n4 = _camera->transformNormal(n4);
     }
 
-    return glm::vec3 {n4.x, n4.y, n4.z};
+    return glm::normalize(glm::vec3 {n4.x, n4.y, n4.z});
+}
+
+components::Light::LightData Renderer::fetchLight(const glm::vec3& pos) {
+    if (_light_it != _lights.end()) {
+        auto res = *_light_it;
+        ++_light_it;
+        return res->getLightData(pos);
+    }
+    else {
+        _light_it = _lights.begin();
+        return components::Light::LightData{};
+    }
 }
 
 } // namespace core::general

@@ -12,6 +12,8 @@ SHADERS_LIST = {
     "vertex", "fragment"
 }
 
+light = nil
+
 function onCreate()
     head = seele.TriMesh("../demo/assets/Africa/african_head.obj", "vertex", "fragment")
     head:setRotation(seele.vec3(0, 180, 0))
@@ -26,18 +28,42 @@ function onCreate()
             90, 1024, 768
     )
     R:setCamera(camera)
+
+    light = seele.DirectionalLight(seele.vec3(0, -1, 0), seele.vec3(255, 255, 255))
+    R:addLight(light)
 end
 
 function vertex(app_data)
     position = R:transformMVP(app_data[1])
+    normal = R:transformNormal(app_data[3])
     return {
         {3, position, true},
         {2, app_data[2], true},
-        {3, app_data[3], true}
+        {3, normal, true}
     }
+end
+
+function clamp(color)
+    return seele.vec3(color.x > 255 and 255 or color.x,
+            color.y > 255 and 255 or color.y,
+            color.z > 255 and 255 or color.y)
+end
+
+function dot(v1, v2)
+    return v1.x * v2.x + v1.y * v2.y + v1.z * v2.z
 end
 
 function fragment(v2f)
     color = R:getTextureColor(0, v2f[2].x, v2f[2].y)
-    return seele.vec3(color.x, color.y, color.z)
+    normal = v2f[3]
+    material = R:getMaterial()
+    res = seele.vec3(color.x * material.Ka.x, color.y * material.Ka.y, color.z * material.Ka.z)
+
+    data = light:getLightData(v2f[1])
+    theta1 = dot(normal, data.direction)
+    res.x = res.x + color.x * material.Kd.x * theta1
+    res.y = res.y + color.y * material.Kd.y * theta1
+    res.z = res.z + color.z * material.Kd.z * theta1
+
+    return clamp(res)
 end

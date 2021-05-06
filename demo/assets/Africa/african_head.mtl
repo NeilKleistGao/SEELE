@@ -1,2 +1,5 @@
 newmtl head
-map_Kd african_head_diffuse.tga
+	Ka 0.02 0.02 0.02
+	Kd 1 1 1
+	Ks 0.6 0.6 0.6
+    map_Kd african_head_diffuse.tga
