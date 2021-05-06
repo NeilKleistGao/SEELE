@@ -38,8 +38,6 @@ Renderer::Renderer(const std::string& script_name, std::string output, int width
     }
 
     registerComponents();
-
-    _light_it = _lights.begin();
 }
 
 Renderer::~Renderer() {
@@ -85,10 +83,8 @@ void Renderer::registerComponents() {
             .addFunction("setCamera", &Renderer::setCamera)
             .addFunction("transformMVP", &Renderer::transformMVP)
             .addFunction("getTextureColor", &Renderer::getTextureColor)
-            .addFunction("addLight", &Renderer::addLight)
             .addFunction("transformNormal", &Renderer::transformNormal)
             .addFunction("getMaterial", &Renderer::getMaterial)
-            .addFunction("fetchLight", &Renderer::fetchLight)
         .endClass()
 
         .beginClass<Transform>("Transform")
@@ -184,17 +180,4 @@ glm::vec3 Renderer::transformNormal(const glm::vec3& n) {
 
     return glm::normalize(glm::vec3 {n4.x, n4.y, n4.z});
 }
-
-components::Light::LightData Renderer::fetchLight(const glm::vec3& pos) {
-    if (_light_it != _lights.end()) {
-        auto res = *_light_it;
-        ++_light_it;
-        return res->getLightData(pos);
-    }
-    else {
-        _light_it = _lights.begin();
-        return components::Light::LightData{};
-    }
-}
-
 } // namespace core::general

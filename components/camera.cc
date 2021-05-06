@@ -28,7 +28,7 @@ Camera::Camera(const glm::vec3& look_from, const glm::vec3& look_at, const glm::
     _v = glm::mat4 {1.0f};
     _v = glm::translate(_v, -_position);
 
-    auto x = glm::cross(look_at, vup);
+    auto x = glm::normalize(glm::cross(look_at, vup));
     auto temp = glm::mat4 {1.0f};
     temp[0][0] = x.x; temp[0][1] = vup.x; temp[0][2] = -look_at.x;
     temp[1][0] = x.y; temp[1][1] = vup.y; temp[1][2] = -look_at.y;
@@ -44,9 +44,9 @@ Camera::Camera(const glm::vec3& look_from, const glm::vec3& look_at, const glm::
     _rtv = glm::mat4 {1.0f};
     _rtv = glm::translate(_rtv, _position);
     temp = glm::mat4 {1.0f};
-    temp[0][0] = 1.0f / x.x; temp[0][1] = 1.0f / x.y; temp[0][2] = 1.0f / x.z;
-    temp[1][0] = 1.0f / vup.x; temp[1][1] = 1.0f / vup.y; temp[1][2] = 1.0f / vup.z;
-    temp[2][0] = -1.0f / look_at.x; temp[2][1] = -1.0f / look_at.y; temp[2][2] = -1.0f / look_at.z;
+    temp[0][0] = x.x; temp[0][1] = x.y; temp[0][2] = x.z;
+    temp[1][0] = vup.x; temp[1][1] = vup.y; temp[1][2] = vup.z;
+    temp[2][0] = -look_at.x; temp[2][1] = -look_at.y; temp[2][2] = -look_at.z;
     _rtv = _rtv * temp;
     _rtv = glm::transpose(_rtv);
 

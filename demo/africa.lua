@@ -29,8 +29,7 @@ function onCreate()
     )
     R:setCamera(camera)
 
-    light = seele.DirectionalLight(seele.vec3(0, -1, 0), seele.vec3(255, 255, 255))
-    R:addLight(light)
+    light = seele.DirectionalLight(seele.vec3(0, 0, -1), seele.vec3(255, 255, 255))
 end
 
 function vertex(app_data)
@@ -61,9 +60,11 @@ function fragment(v2f)
 
     data = light:getLightData(v2f[1])
     theta1 = dot(normal, data.direction)
-    res.x = res.x + color.x * material.Kd.x * theta1
-    res.y = res.y + color.y * material.Kd.y * theta1
-    res.z = res.z + color.z * material.Kd.z * theta1
+    if theta1 >= 0.0 then
+        res.x = res.x + color.x * material.Kd.x * theta1
+        res.y = res.y + color.y * material.Kd.y * theta1
+        res.z = res.z + color.z * material.Kd.z * theta1
+    end
 
     return clamp(res)
 end

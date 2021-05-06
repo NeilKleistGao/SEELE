@@ -60,14 +60,7 @@ public:
 
     glm::vec3 getTextureColor(int i, float x, float y);
 
-    inline void addLight(components::Light* light) {
-        _lights.push_back(light);
-        _light_it = _lights.begin();
-    }
-
     glm::vec3 transformNormal(const glm::vec3& n);
-
-    components::Light::LightData fetchLight(const glm::vec3& pos);
 
     inline void setMaterial(assets::Material material) {
         _material = material;
@@ -94,7 +87,6 @@ protected:
     int _height;
 
     std::list<components::Transform*> _transforms;
-    std::list<components::Light*> _lights;
 
     std::list<components::Light*>::iterator _light_it;
 
