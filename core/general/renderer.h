@@ -58,6 +58,8 @@ public:
         _textures[i] = texture;
     }
 
+    void loadTexture(int i, const std::string& filename);
+
     glm::vec3 getTextureColor(int i, float x, float y);
 
     glm::vec3 transformNormal(const glm::vec3& n);

@@ -116,6 +116,8 @@ void Renderer::registerComponents() {
         .deriveClass<DirectionalLight, Light>("DirectionalLight")
             .addConstructor<void (*) (const glm::vec3&, const glm::vec3&)>()
         .endClass()
+
+        .addFunction<glm::vec3, const glm::vec3&>("normalize", &glm::normalize)
     .endNamespace();
 
     luabridge::setGlobal(_state, this, "R");
@@ -179,5 +181,9 @@ glm::vec3 Renderer::transformNormal(const glm::vec3& n) {
     }
 
     return glm::normalize(glm::vec3 {n4.x, n4.y, n4.z});
+}
+
+void Renderer::loadTexture(int i, const std::string& filename) {
+
 }
 } // namespace core::general

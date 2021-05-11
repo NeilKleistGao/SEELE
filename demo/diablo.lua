@@ -6,7 +6,7 @@
 --- We, the Free Software Foundation, use the GNU General Public License for most of our software;
 --- it applies also to any other work released this way by its authors. You can apply it to your programs, too.
 
---- africa.lua
+--- diablo.lua
 
 SHADERS_LIST = {
     "vertex", "fragment"
@@ -15,10 +15,10 @@ SHADERS_LIST = {
 light = nil
 
 function onCreate()
-    head = seele.TriMesh("../demo/assets/Africa/african_head.obj", "vertex", "fragment")
-    head:setRotation(seele.vec3(0, 145, 0))
+    head = seele.TriMesh("../demo/assets/Diablo/diablo3_pose.obj", "vertex", "fragment")
+    head:setRotation(seele.vec3(0, 180, 0))
     head:setScale(seele.vec3(300, 300, 300))
-    head:setPosition(seele.vec3(-250, 0, -400))
+    head:setPosition(seele.vec3(0, 0, -400))
     R:addObject(head)
 
     camera = seele.Camera(
@@ -29,7 +29,7 @@ function onCreate()
     )
     R:setCamera(camera)
 
-    light = seele.DirectionalLight(seele.normalize(seele.vec3(1, 0, -1)), seele.vec3(255, 255, 255))
+    light = seele.DirectionalLight(seele.normalize(seele.vec3(0, -1, 0)), seele.vec3(255, 255, 255))
 end
 
 function vertex(app_data)

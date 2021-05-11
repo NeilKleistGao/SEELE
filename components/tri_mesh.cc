@@ -31,7 +31,15 @@ TriMesh::TriMesh(std::string filename, std::string vertex_shader, std::string fr
     _object->LoadFile(p.string());
 
     for (const auto& mat : _object->LoadedMaterials) {
-        _textures[mat.map_Kd] = new assets::Texture(p.parent_path().string() + "/" + mat.map_Kd);
+        if (!mat.map_Ka.empty() && _textures.find(mat.map_Ka) == _textures.end()) {
+            _textures[mat.map_Ka] = new assets::Texture(p.parent_path().string() + "/" + mat.map_Ka);
+        }
+        if (!mat.map_Kd.empty() && _textures.find(mat.map_Kd) == _textures.end()) {
+            _textures[mat.map_Kd] = new assets::Texture(p.parent_path().string() + "/" + mat.map_Kd);
+        }
+        if (!mat.map_Ks.empty() && _textures.find(mat.map_Ks) == _textures.end()) {
+            _textures[mat.map_Ks] = new assets::Texture(p.parent_path().string() + "/" + mat.map_Ks);
+        }
     }
 }
 
@@ -49,7 +57,16 @@ void TriMesh::rasterize(core::rasterization::RasterizationRenderer* renderer) {
 
     for (auto& mesh : _object->LoadedMeshes) {
         if (mesh.MeshMaterial.has_value()) {
-            renderer->setTexture(0, _textures[mesh.MeshMaterial->map_Kd]);
+            if (!mesh.MeshMaterial->map_Ka.empty()) {
+                renderer->setTexture(0, _textures[mesh.MeshMaterial->map_Ka]);
+            }
+            if (!mesh.MeshMaterial->map_Kd.empty()) {
+                renderer->setTexture(1, _textures[mesh.MeshMaterial->map_Kd]);
+            }
+            if (!mesh.MeshMaterial->map_Ks.empty()) {
+                renderer->setTexture(2, _textures[mesh.MeshMaterial->map_Ks]);
+            }
+
             auto ka = mesh.MeshMaterial->Ka;
             auto kd = mesh.MeshMaterial->Kd;
             auto ks = mesh.MeshMaterial->Ks;
@@ -93,6 +110,9 @@ void TriMesh::rasterize(core::rasterization::RasterizationRenderer* renderer) {
                         auto f_data = interpolate(v2f[0], v2f[1], v2f[2],
                                                   u, v, w);
                         auto color = f_shader->onFragment(f_data);
+                        if (color.r < 0 || color.g < 0 || color.b < 0) {
+                            continue; // discard
+                        }
                         renderer->putPixel({j, k, f_data[0].vec3.z}, color);
                     }
                 }

@@ -1,0 +1,7 @@
+newmtl diablo
+	Ka 0.8 0.8 0.8
+	Kd 0.6 0.6 0.6
+	Ks 0.8 0.8 0.8
+	map_Ka diablo3_pose_diffuse.tga
+    map_Kd diablo3_pose_diffuse.tga
+    map_Ks diablo3_pose_spec.tga

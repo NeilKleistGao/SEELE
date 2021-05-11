@@ -40,6 +40,9 @@ glm::vec4 Texture::getColor(float x, float y) const {
     else if (_channel == 4) {
         return glm::vec4 {_image[index], _image[index + 1], _image[index + 2], _image[index + 3]};
     }
+    else if (_channel == 1) {
+        return glm::vec4 {_image[index], 0, 0, 0};
+    }
     else {
         return glm::vec4 {};
     }
