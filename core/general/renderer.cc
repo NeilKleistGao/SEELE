@@ -19,6 +19,7 @@
 #include "components/tri_mesh.h"
 #include "components/camera.h"
 #include "components/directional_light.h"
+#include "../rasterization/rasterization_renderer.h"
 
 namespace core::general {
 
@@ -38,6 +39,7 @@ Renderer::Renderer(const std::string& script_name, std::string output, int width
     }
 
     registerComponents();
+    luabridge::setGlobal(_state, this, "R");
 }
 
 Renderer::~Renderer() {
@@ -87,6 +89,10 @@ void Renderer::registerComponents() {
             .addFunction("getMaterial", &Renderer::getMaterial)
         .endClass()
 
+        .deriveClass<rasterization::RasterizationRenderer, Renderer>("RasterizationRenderer")
+            .addFunction("setPass", &rasterization::RasterizationRenderer::setPass)
+        .endClass()
+
         .beginClass<Transform>("Transform")
             .addFunction("setPosition", &Transform::setPosition)
             .addFunction("setRotation", &Transform::setRotation)
@@ -106,7 +112,7 @@ void Renderer::registerComponents() {
         .endClass()
 
         .deriveClass<TriMesh, Transform>("TriMesh")
-            .addConstructor<void (*) (std::string, std::string, std::string)>()
+            .addConstructor<void (*) (std::string, const luabridge::LuaRef&, const luabridge::LuaRef&)>()
         .endClass()
 
         .deriveClass<Light, Transform>("Light")
@@ -119,8 +125,6 @@ void Renderer::registerComponents() {
 
         .addFunction<glm::vec3, const glm::vec3&>("normalize", &glm::normalize)
     .endNamespace();
-
-    luabridge::setGlobal(_state, this, "R");
 }
 
 void Renderer::create() {

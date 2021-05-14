@@ -18,11 +18,13 @@
 namespace core::rasterization {
 
 RasterizationRenderer::RasterizationRenderer(const std::string& script_name, std::string output, int width, int height)
-    : general::Renderer(script_name, std::move(output), width, height) {
+    : general::Renderer(script_name, std::move(output), width, height), _pass(1) {
     _z_buffer = new float[width * height];
     for (int i = 0; i < width * height; ++i) {
         _z_buffer[i] = std::numeric_limits<float>::lowest();
     }
+
+    luabridge::setGlobal(_state, this, "R");
 }
 
 RasterizationRenderer::~RasterizationRenderer() {
@@ -38,12 +40,26 @@ void RasterizationRenderer::render() {
         return;
     }
 
-    int finished = 0;
-    for (auto* transform : _transforms) {
-        _current = transform;
-        _current->rasterize(this);
-        ++finished;
-        _process = static_cast<float>(finished) / static_cast<float>(total);
+    luabridge::LuaRef change_pass = luabridge::LuaRef(_state);
+    if (_pass > 1) {
+        change_pass = luabridge::getGlobal(_state, "changePass");
+        if (!change_pass.isFunction()) {
+            change_pass = luabridge::LuaRef(_state);
+        }
+    }
+
+    for (int i = 1; i <= _pass; ++i) {
+        int finished = 0;
+        for (auto* transform : _transforms) {
+            _current = transform;
+            _current->rasterize(this, i);
+            ++finished;
+            _process = (static_cast<float>(finished) * i) / (static_cast<float>(total) * _pass);
+
+            if (change_pass.isFunction() && i != _pass) {
+                change_pass(i, i + 1);
+            }
+        }
     }
 }
 

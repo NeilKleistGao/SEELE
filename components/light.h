@@ -30,7 +30,7 @@ public:
     };
 
     virtual LightData getLightData(const glm::vec3& pos) = 0;
-    void rasterize(core::rasterization::RasterizationRenderer* renderer) override {}
+    void rasterize(core::rasterization::RasterizationRenderer* renderer, int pass) override {}
 private:
 protected:
 };

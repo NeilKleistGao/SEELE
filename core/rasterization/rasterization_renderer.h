@@ -24,8 +24,14 @@ public:
     void render() override;
 
     void putPixel(const glm::vec3& pos, const glm::vec3& color);
+
+    inline void setPass(int pass) {
+        _pass = pass;
+    }
 private:
     float* _z_buffer;
+
+    int _pass;
 protected:
 };
 

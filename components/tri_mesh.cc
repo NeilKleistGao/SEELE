@@ -22,10 +22,10 @@
 
 namespace components {
 
-TriMesh::TriMesh(std::string filename, std::string vertex_shader, std::string fragment_shader)
+TriMesh::TriMesh(std::string filename, const luabridge::LuaRef& vertex_shader, const luabridge::LuaRef& fragment_shader)
         : Transform(), _object(nullptr),
-          _fragment_shader(std::move(fragment_shader)),
-          _vertex_shader(std::move(vertex_shader)) {
+          _fragment_shader(fragment_shader),
+          _vertex_shader(vertex_shader) {
     std::filesystem::path p = std::move(filename);
     _object = new objl::Loader();
     _object->LoadFile(p.string());
@@ -50,10 +50,10 @@ TriMesh::~TriMesh() {
     }
 }
 
-void TriMesh::rasterize(core::rasterization::RasterizationRenderer* renderer) {
+void TriMesh::rasterize(core::rasterization::RasterizationRenderer* renderer, int pass) {
     updateModelMatrix();
-    auto v_shader = renderer->getShader(_vertex_shader);
-    auto f_shader = renderer->getShader(_fragment_shader);
+    auto v_shader = renderer->getShader(_vertex_shader[pass]);
+    auto f_shader = renderer->getShader(_fragment_shader[pass]);
 
     for (auto& mesh : _object->LoadedMeshes) {
         if (mesh.MeshMaterial.has_value()) {

@@ -29,17 +29,17 @@ namespace components {
 
 class TriMesh : public Transform {
 public:
-    TriMesh(std::string filename, std::string vertex_shader, std::string fragment_shader);
+    TriMesh(std::string filename, const luabridge::LuaRef& vertex_shader, const luabridge::LuaRef& fragment_shader);
     ~TriMesh() override;
 
-    void rasterize(core::rasterization::RasterizationRenderer* renderer) override;
+    void rasterize(core::rasterization::RasterizationRenderer* renderer, int pass) override;
 private:
     using ShaderDataItem = core::general::Shader::ShaderDataItem;
     using ShaderDataList = std::vector<ShaderDataItem>;
     objl::Loader* _object;
 
-    std::string _vertex_shader;
-    std::string _fragment_shader;
+    luabridge::LuaRef _vertex_shader;
+    luabridge::LuaRef _fragment_shader;
 
     std::map<std::string, assets::Texture*> _textures;
 

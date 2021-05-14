@@ -57,7 +57,7 @@ public:
         return _rt_model * n;
     }
 
-    virtual void rasterize(core::rasterization::RasterizationRenderer* renderer) = 0;
+    virtual void rasterize(core::rasterization::RasterizationRenderer* renderer, int pass) = 0;
 private:
     glm::mat4 _model;
     glm::mat4 _rt_model;

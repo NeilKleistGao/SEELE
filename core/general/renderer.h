@@ -74,13 +74,13 @@ public:
 private:
     constexpr static int TEXTURE_COUNT = 8;
 
-    lua_State* _state;
     std::map<std::string, Shader*> _shaders;
     assets::Texture* _textures[TEXTURE_COUNT];
     assets::Material _material;
 
     void registerComponents();
 protected:
+    lua_State* _state;
     float _process;
     Image* _image;
     components::Transform* _current;

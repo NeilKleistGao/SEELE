@@ -15,7 +15,7 @@ SHADERS_LIST = {
 light = nil
 
 function onCreate()
-    head = seele.TriMesh("../demo/assets/Africa/african_head.obj", "vertex", "fragment")
+    head = seele.TriMesh("../demo/assets/Africa/african_head.obj", {"vertex"}, {"fragment"})
     head:setRotation(seele.vec3(0, 145, 0))
     head:setScale(seele.vec3(300, 300, 300))
     head:setPosition(seele.vec3(-250, 0, -400))
