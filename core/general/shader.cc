@@ -96,4 +96,22 @@ std::vector<Shader::ShaderDataItem> Shader::parseTable(const luabridge::LuaRef& 
     return res;
 }
 
+Shader::ShaderDataItem::ShaderDataItem(const ShaderDataItem& other)
+    : interpolation(other.interpolation), dimension(other.dimension) {
+    switch (dimension) {
+        case 1:
+            f = other.f;
+            break;
+        case 2:
+            vec2 = other.vec2;
+            break;
+        case 3:
+            vec3 = other.vec3;
+            break;
+        case 4:
+            vec4 = other.vec4;
+            break;
+    }
+}
+
 } // namespace core::general

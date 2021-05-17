@@ -34,6 +34,9 @@ public:
 
         int dimension;
         bool interpolation;
+
+        ShaderDataItem() = default;
+        ShaderDataItem(const ShaderDataItem& other);
     };
 
     Shader(lua_State* state, const std::string& function_name);

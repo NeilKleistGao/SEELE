@@ -13,7 +13,38 @@
 #ifndef SEELE_SPHERE_H
 #define SEELE_SPHERE_H
 
+#include <string>
+
+#include "transform.h"
+#include "core/general/shader.h"
+#include "assets/texture.h"
+
 namespace components {
+
+class Sphere : public Transform {
+public:
+    Sphere(float radius, const luabridge::LuaRef& vertex_shader, const luabridge::LuaRef& fragment_shader);
+    ~Sphere() override = default;
+
+    void rasterize(core::rasterization::RasterizationRenderer* renderer, int pass) override;
+private:
+    using ShaderDataItem = core::general::Shader::ShaderDataItem;
+    using ShaderDataList = std::vector<ShaderDataItem>;
+
+    constexpr static float PI = 3.1415926535f;
+
+    float _radius;
+
+    luabridge::LuaRef _vertex_shader;
+    luabridge::LuaRef _fragment_shader;
+
+    glm::vec2 getUV(const glm::vec3& pos) const;
+
+    inline glm::vec3 getNormal(const glm::vec3& pos) const {
+        return glm::normalize(pos);
+    }
+protected:
+};
 
 } // namespace components
 

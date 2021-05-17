@@ -12,6 +12,62 @@
 
 #include "sphere.h"
 
+#include <cmath>
+
+#include "core/rasterization/rasterization_renderer.h"
+
 namespace components {
+
+Sphere::Sphere(float radius,
+               const luabridge::LuaRef& vertex_shader,
+               const luabridge::LuaRef& fragment_shader)
+               : Transform(), _vertex_shader(vertex_shader),
+               _fragment_shader(fragment_shader), _radius(radius) {
+}
+
+void Sphere::rasterize(core::rasterization::RasterizationRenderer* renderer, int pass) {
+    updateModelMatrix();
+    auto v_shader = renderer->getShader(_vertex_shader[pass]);
+    auto f_shader = renderer->getShader(_fragment_shader[pass]);
+
+    for (int i = -_radius; i <= _radius; ++i) {
+        for (int j = -_radius; j <= _radius; j++) {
+            for (int k = -_radius; k <= _radius; ++k) {
+                float x = i, y = j, z = k;
+                if (x * x + y * y + z * z <= _radius * _radius) {
+                    ShaderDataList appdata;
+                    appdata.emplace_back(); appdata.emplace_back(); appdata.emplace_back();
+                    appdata[0].dimension = 3; appdata[0].vec3 = {x, y, z}; appdata[0].interpolation = false;
+                    appdata[1].dimension = 2; appdata[1].vec2 = getUV({x, y, z}); appdata[1].interpolation = false;
+                    appdata[2].dimension = 3; appdata[2].vec3 = getNormal({x, y, z}); appdata[2].interpolation = false;
+
+                    auto v2f = v_shader->onVertex(appdata);
+                    auto color = f_shader->onFragment(v2f);
+                    renderer->putPixel({x, y, z}, color);
+                }
+
+                x += 0.5f; y += 0.5f; z += 0.5f;
+                if (x * x + y * y + z * z <= _radius * _radius) {
+                    ShaderDataList appdata;
+                    appdata.emplace_back(); appdata.emplace_back(); appdata.emplace_back();
+                    appdata[0].dimension = 3; appdata[0].vec3 = {x, y, z}; appdata[0].interpolation = false;
+                    appdata[1].dimension = 2; appdata[1].vec2 = getUV({x, y, z}); appdata[1].interpolation = false;
+                    appdata[2].dimension = 3; appdata[2].vec3 = getNormal({x, y, z}); appdata[2].interpolation = false;
+
+                    auto v2f = v_shader->onVertex(appdata);
+                    auto color = f_shader->onFragment(v2f);
+                    renderer->putPixel({x, y, z}, color);
+                }
+            }
+        }
+    }
+}
+
+glm::vec2 Sphere::getUV(const glm::vec3& pos) const {
+    float phi = std::atan2(pos.z, pos.x),
+          theta = asin(pos.y / _radius);
+
+    return glm::vec2(1 - (phi + PI) / (2 * PI), (theta + PI / 2) / PI);
+}
 
 } // namespace components

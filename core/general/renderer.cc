@@ -20,6 +20,7 @@
 #include "components/camera.h"
 #include "components/directional_light.h"
 #include "../rasterization/rasterization_renderer.h"
+#include "components/sphere.h"
 
 namespace core::general {
 
@@ -113,6 +114,10 @@ void Renderer::registerComponents() {
 
         .deriveClass<TriMesh, Transform>("TriMesh")
             .addConstructor<void (*) (std::string, const luabridge::LuaRef&, const luabridge::LuaRef&)>()
+        .endClass()
+
+        .deriveClass<Sphere, Transform>("Sphere")
+            .addConstructor<void (*) (const float&, const luabridge::LuaRef&, const luabridge::LuaRef&)>()
         .endClass()
 
         .deriveClass<Light, Transform>("Light")
