@@ -25,7 +25,7 @@ public:
     glm::vec4 transform(const glm::vec4& vec) override;
 
     inline glm::vec4 transformNormal(const glm::vec4& n) const {
-        return _rtp * _rtv * n;
+        return _rtv * n;
     }
 
     void rasterize(core::rasterization::RasterizationRenderer* renderer, int pass) override {}
@@ -33,7 +33,6 @@ private:
     glm::mat4 _v;
     glm::mat4 _p;
     glm::mat4 _rtv;
-    glm::mat4 _rtp;
     float _focus;
     float _width;
     float _height;

@@ -48,13 +48,6 @@ Camera::Camera(const glm::vec3& look_from, const glm::vec3& look_at, const glm::
     temp[2][0] = -look_at.x; temp[2][1] = -look_at.y; temp[2][2] = -look_at.z;
     _rtv = _rtv * temp;
     _rtv = glm::transpose(_rtv);
-
-    _rtp = glm::mat4 {0.0f};
-    _rtp[0][0] = _width / (2 * _focus);
-    _rtp[1][1] = _height / (2 * _focus);
-    _rtp[3][2] = -1;
-    _rtp[2][3] = -1 / (2 * _focus);
-    _rtp[3][3] = 1 / (2 * _focus);
 }
 
 Camera::~Camera() = default;

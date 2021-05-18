@@ -1,7 +1,7 @@
 newmtl head
 	Ka 0.8 0.8 0.8
 	Kd 0.6 0.6 0.6
-	Ks 0.6 0.6 0.6
+	Ks 0.01 0.01 0.01
 	map_Ka african_head_diffuse.tga
     map_Kd african_head_diffuse.tga
     map_Ks african_head_spec.tga

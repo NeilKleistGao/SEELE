@@ -15,19 +15,19 @@ SHADERS_LIST = {
 light = nil
 
 function onCreate()
-    sphere = seele.Sphere(10, {"vertex"}, {"fragment"})
-    sphere:setPosition(seele.vec3(0, 0, -400))
+    sphere = seele.Sphere(50, {"vertex"}, {"fragment"})
+    sphere:setPosition(seele.vec3(0, 0, 400))
     R:addObject(sphere)
 
     camera = seele.Camera(
             seele.vec3(0, 0, 0),
-            seele.vec3(0, 0, -1),
+            seele.vec3(0, 0, 1),
             seele.vec3(0, -1, 0),
             90, 1024, 768
     )
     R:setCamera(camera)
 
-    light = seele.DirectionalLight(seele.normalize(seele.vec3(0, -1, 0)), seele.vec3(255, 255, 255))
+    light = seele.DirectionalLight(seele.normalize(seele.vec3(0, 1, 1)), seele.vec3(255, 255, 255))
 end
 
 function vertex(app_data)
@@ -59,20 +59,22 @@ function fragment(v2f)
     color = seele.vec3(0x66, 0xcc, 0xff)
     normal = v2f[3]
     res = seele.vec3(color.x * 0.3, color.y * 0.3, color.z * 0.3)
+    --res = seele.vec3(0, 0, 0)
 
+    pos = v2f[1]
     data = light:getLightData(v2f[1])
     theta = dot(normal, data.direction)
     if theta > 0.0 then
-        res.x = res.x + color.x * theta * 0.5
-        res.y = res.y + color.y * theta * 0.5
-        res.z = res.z + color.z * theta * 0.5
+        res.x = res.x + color.x * theta
+        res.y = res.y + color.y * theta
+        res.z = res.z + color.z * theta
     end
 
     reflect = getReflect(normal, data.direction)
-    spec_coff = 0.1^(math.max(0, reflect.z))
-    res.x = res.x + color.x * spec_coff * 0.3
-    res.y = res.y + color.y * spec_coff * 0.3
-    res.z = res.z + color.z * spec_coff * 0.3
+    spec_coff = 0.0001^(math.max(0, reflect.z))
+    res.x = res.x + 255 * spec_coff * 0.01
+    res.y = res.y + 255 * spec_coff * 0.01
+    res.z = res.z + 255 * spec_coff * 0.01
 
     return clamp(res)
 end
