@@ -8,33 +8,15 @@
  * it applies also to any other work released this way by its authors. You can apply it to your programs, too.
  */
 
-/// @file raytracing_renderer.cc
-
-#include "raytracing_renderer.h"
-
-#include <utility>
+/// @file ray.cc
 
 #include "ray.h"
 
-namespace core::raytracing {
+namespace raytracing {
 
-RaytracingRenderer::RaytracingRenderer(const std::string& script_name, std::string output, int width, int height)
-    : general::Renderer(script_name, std::move(output), width, height) {
-
+Ray::Ray(const glm::vec3& origin, const glm::vec3& direction) : _origin(origin), _direction(1, 0, 0) {
+    _origin = origin;
+    _direction = glm::normalize(direction);
 }
 
-void RaytracingRenderer::render() {
-    if (_camera == nullptr) {
-        return;
-    }
-
-    int total = _width * _height, finished = 0;
-    for (int i = 0; i < _width; ++i) {
-        for (int j = 0; j < _height; ++j) {
-            ++finished;
-            _process = (static_cast<float>(finished) * i) / static_cast<float>(total);
-        }
-    }
-}
-
-} // namespace core::raytracing
+} // namespace raytracing

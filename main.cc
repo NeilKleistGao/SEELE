@@ -14,6 +14,7 @@
 #include <iomanip>
 #include <thread>
 #include <atomic>
+#include <fstream>
 
 #include "cxxopts/cxxopts.hpp"
 #include "core/general/renderer.h"
@@ -23,6 +24,22 @@
 
 static core::general::Renderer* render;
 static std::atomic<bool> finished{false};
+
+static const std::string LUA_TEMPLATE = "SHADERS_LIST = {\n"
+                                        "    \"vertex\", \"fragment\"\n"
+                                        "}\n"
+                                        "\n"
+                                        "function onCreate()\n"
+                                        "    \n"
+                                        "end\n"
+                                        "\n"
+                                        "function vertex(app_data)\n"
+                                        "\n"
+                                        "end\n"
+                                        "\n"
+                                        "function fragment(v2f)\n"
+                                        "\n"
+                                        "end";
 
 void wait() {
     while (!finished.load()) {
@@ -40,10 +57,17 @@ void wait() {
     }
 }
 
+void create(const std::string& filename) {
+    std::ofstream stream{filename};
+    stream << LUA_TEMPLATE << std::endl;
+    stream.close();
+}
+
 int main(int argc, char* argv[]) {
     cxxopts::Options options{"SEELE", "Software-rEndEring Laboratorial Engine"};
 
     options.add_options()
+    ("c,create", "Create A New Rendering Script", cxxopts::value<std::string>()->default_value(""))
     ("s,script", "Rendering Script", cxxopts::value<std::string>())
     ("m,method", "Rendering Method", cxxopts::value<std::string>()->default_value("rasterization"))
     ("w,width", "Image Width", cxxopts::value<int>()->default_value("1024"))
@@ -52,41 +76,47 @@ int main(int argc, char* argv[]) {
 
     try {
         auto result = options.parse(argc, argv);
-        std::string method = result["method"].as<std::string>();
-        std::string script_path = result["script"].as<std::string>();
-        int width = result["width"].as<int>(),
-            height = result["height"].as<int>();
-        std::string output_file = result["filename"].as<std::string>();
-
-        auto begin = std::chrono::system_clock::now();
-        if (method == "rasterization") {
-            render = new core::rasterization::RasterizationRenderer(script_path, output_file, width, height);
-        }
-        else if (method == "raytracing") {
-            render = new core::raytracing::RaytracingRenderer(script_path, output_file, width, height);
-        }
-        else if (method == "photon") {
-            render = new core::photon::PhotonRenderer(script_path, output_file, width, height);
+        std::string create_name = result["create"].as<std::string>();
+        if (!create_name.empty()) {
+            create(create_name);
         }
         else {
-            throw std::exception{};
+            std::string method = result["method"].as<std::string>();
+            std::string script_path = result["script"].as<std::string>();
+            int width = result["width"].as<int>(),
+                    height = result["height"].as<int>();
+            std::string output_file = result["filename"].as<std::string>();
+
+            auto begin = std::chrono::system_clock::now();
+            if (method == "rasterization") {
+                render = new core::rasterization::RasterizationRenderer(script_path, output_file, width, height);
+            }
+            else if (method == "raytracing") {
+                render = new core::raytracing::RaytracingRenderer(script_path, output_file, width, height);
+            }
+            else if (method == "photon") {
+                render = new core::photon::PhotonRenderer(script_path, output_file, width, height);
+            }
+            else {
+                throw std::exception{};
+            }
+
+            std::thread render_thread{[](){
+                render->render();
+                finished.store(true);
+            }};
+            wait();
+            render_thread.join();
+
+            auto end = std::chrono::system_clock::now();
+
+            std::chrono::duration<double> diff = end - begin;
+            double length = diff.count();
+            std::cout << "rendering finished, using " << std::setw(4) << length << "s." << std::endl;
+
+            delete render;
+            render = nullptr;
         }
-
-        std::thread render_thread{[](){
-            render->render();
-            finished.store(true);
-        }};
-        wait();
-        render_thread.join();
-
-        auto end = std::chrono::system_clock::now();
-
-        std::chrono::duration<double> diff = end - begin;
-        double length = diff.count();
-        std::cout << "rendering finished, using " << std::setw(4) << length << "s." << std::endl;
-
-        delete render;
-        render = nullptr;
     }
     catch (const std::exception& e) {
         std::cerr << e.what() << std::endl;

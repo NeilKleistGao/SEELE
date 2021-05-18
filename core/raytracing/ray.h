@@ -8,33 +8,36 @@
  * it applies also to any other work released this way by its authors. You can apply it to your programs, too.
  */
 
-/// @file raytracing_renderer.cc
+/// @file ray.h
 
-#include "raytracing_renderer.h"
+#ifndef SEELE_RAY_H
+#define SEELE_RAY_H
 
-#include <utility>
+#include "glm/glm.hpp"
 
-#include "ray.h"
+namespace raytracing {
 
-namespace core::raytracing {
+class Ray {
+public:
+    Ray(const glm::vec3& origin, const glm::vec3& direction);
+    ~Ray() = default;
 
-RaytracingRenderer::RaytracingRenderer(const std::string& script_name, std::string output, int width, int height)
-    : general::Renderer(script_name, std::move(output), width, height) {
-
-}
-
-void RaytracingRenderer::render() {
-    if (_camera == nullptr) {
-        return;
+    inline glm::vec3 getOrigin() const {
+        return _origin;
     }
 
-    int total = _width * _height, finished = 0;
-    for (int i = 0; i < _width; ++i) {
-        for (int j = 0; j < _height; ++j) {
-            ++finished;
-            _process = (static_cast<float>(finished) * i) / static_cast<float>(total);
-        }
+    inline glm::vec3 getDirection() const {
+        return _direction;
     }
-}
 
-} // namespace core::raytracing
+    inline glm::vec3 at(float t) const {
+        return _origin + t * _direction;
+    }
+private:
+    glm::vec3 _origin;
+    glm::vec3 _direction;
+};
+
+} // namespace raytracing
+
+#endif //SEELE_RAY_H
