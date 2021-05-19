@@ -19,7 +19,7 @@
 namespace components {
 
 Camera::Camera(const glm::vec3& look_from, const glm::vec3& look_at, const glm::vec3& vup, float fov, float width, float height)
-: Transform(), _width(width), _height(height) {
+: Transform(), _width(width), _height(height), _look_from(look_from), _look_at(look_at), _vup(vup) {
     _position = look_from;
 
     auto theta = fov / 180.0f * 3.1415926535f;
@@ -52,9 +52,17 @@ Camera::Camera(const glm::vec3& look_from, const glm::vec3& look_at, const glm::
 
 Camera::~Camera() = default;
 
-glm::vec4 Camera::transform(const glm::vec4& vec) {
+glm::vec4 Camera::transform(const glm::vec4& vec) const {
     auto temp =  _p * _v * vec;
     return {temp.x * (_width / 2.0f), temp.y * (_height / 2.0f), temp.z, temp.w};
+}
+
+glm::vec3 Camera::getPixelPosition(int x, int y) const {
+    auto near = _look_from + _focus * glm::normalize(_look_at);
+    auto left = glm::normalize(glm::cross(_vup, _look_at));
+    auto lb = near - (_width / 2) * left - (_height / 2) * _vup;
+
+    return lb + static_cast<float>(x) * left + static_cast<float>(y) * _vup;
 }
 
 } // namespace components

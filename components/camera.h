@@ -22,17 +22,36 @@ public:
     Camera(const glm::vec3& look_from, const glm::vec3& look_at, const glm::vec3& vup, float fov, float width, float height);
     ~Camera() override;
 
-    glm::vec4 transform(const glm::vec4& vec) override;
+    glm::vec4 transform(const glm::vec4& vec) const override;
 
     inline glm::vec4 transformNormal(const glm::vec4& n) const {
         return _rtv * n;
     }
 
     void rasterize(core::rasterization::RasterizationRenderer* renderer, int pass) override {}
+
+    inline glm::vec2 getSize() const {
+        return {_width, _height};
+    }
+
+    inline glm::vec3 getOrigin() const {
+        return _look_from;
+    }
+
+    glm::vec3 getPixelPosition(int x, int y) const;
+
+    float intersect(const core::raytracing::Ray& ray) const override { return 0.0f; }
+
+    glm::vec3 calculateColor(const core::raytracing::Ray& ray, float t) const override { return {}; }
 private:
     glm::mat4 _v;
     glm::mat4 _p;
     glm::mat4 _rtv;
+
+    glm::vec3 _look_from;
+    glm::vec3 _look_at;
+    glm::vec3 _vup;
+
     float _focus;
     float _width;
     float _height;

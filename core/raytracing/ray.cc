@@ -12,7 +12,7 @@
 
 #include "ray.h"
 
-namespace raytracing {
+namespace core::raytracing {
 
 Ray::Ray(const glm::vec3& origin, const glm::vec3& direction) : _origin(origin), _direction(1, 0, 0) {
     _origin = origin;

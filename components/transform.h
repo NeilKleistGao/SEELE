@@ -15,6 +15,8 @@
 
 #include "glm/glm.hpp"
 
+#include "core/raytracing/ray.h"
+
 namespace core::rasterization {
 class RasterizationRenderer;
 } // namespace core::general
@@ -49,7 +51,7 @@ public:
         return _scale;
     }
 
-    virtual glm::vec4 transform(const glm::vec4& v) {
+    virtual glm::vec4 transform(const glm::vec4& v) const {
         return _model * v;
     }
 
@@ -58,6 +60,10 @@ public:
     }
 
     virtual void rasterize(core::rasterization::RasterizationRenderer* renderer, int pass) = 0;
+
+    virtual float intersect(const core::raytracing::Ray& ray) const = 0;
+
+    virtual glm::vec3 calculateColor(const core::raytracing::Ray& ray, float t) const = 0;
 private:
     glm::mat4 _model;
     glm::mat4 _rt_model;

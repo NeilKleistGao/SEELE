@@ -70,4 +70,31 @@ glm::vec2 Sphere::getUV(const glm::vec3& pos) const {
     return glm::vec2(1 - (phi + PI) / (2 * PI), (theta + PI / 2) / PI);
 }
 
+float Sphere::intersect(const core::raytracing::Ray& ray) const {
+    auto sub = ray.getOrigin() - _position;
+
+    float a = glm::dot(ray.getDirection(), ray.getDirection()),
+          b = 2.0f * glm::dot(ray.getDirection(), sub),
+          c = glm::dot(sub, sub) - _radius * _radius;
+
+    float delta = b * b - 4 * a * c;
+    if (delta < 0) {
+        return NAN;
+    }
+
+    float t1 = (-b + std::sqrt(delta)) / (2 * a),
+          t2 = (-b - std::sqrt(delta)) / (2 * a);
+
+    if (t1 > t2) {
+        std::swap(t1, t2);
+    }
+
+    return (t1 < 0) ? t2 : t1;
+}
+
+glm::vec3 Sphere::calculateColor(const core::raytracing::Ray& ray, float t) const {
+    // TODO:
+    return {};
+}
+
 } // namespace components

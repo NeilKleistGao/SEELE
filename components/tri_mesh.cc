@@ -166,4 +166,14 @@ TriMesh::ShaderDataList TriMesh::interpolate(
     return res;
 }
 
+float TriMesh::intersect(const core::raytracing::Ray& ray) const {
+    // TODO:
+    return 0.0f;
+}
+
+glm::vec3 TriMesh::calculateColor(const core::raytracing::Ray& ray, float t) const {
+    // TODO:
+    return {};
+}
+
 } // namespace components

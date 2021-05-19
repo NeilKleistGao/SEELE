@@ -15,7 +15,7 @@
 
 #include "glm/glm.hpp"
 
-namespace raytracing {
+namespace core::raytracing {
 
 class Ray {
 public:

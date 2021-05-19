@@ -24,15 +24,35 @@ RaytracingRenderer::RaytracingRenderer(const std::string& script_name, std::stri
 }
 
 void RaytracingRenderer::render() {
+    create();
     if (_camera == nullptr) {
         return;
     }
 
+    auto origin = _camera->getOrigin();
     int total = _width * _height, finished = 0;
     for (int i = 0; i < _width; ++i) {
         for (int j = 0; j < _height; ++j) {
+            Ray ray(origin, _camera->getPixelPosition(i, j) - origin);
+            float min = -1.0f;
+            const components::Transform* hit = nullptr;
+
+            for (const auto* trans : _transforms) {
+                float res = trans->intersect(ray);
+                if (!std::isnan(res) && res > 0) {
+                    if (min < 0 || res < min) {
+                        min = res;
+                        hit = trans;
+                    }
+                }
+            }
+
+            if (hit != nullptr) {
+                _image->putPixel(i, j, 0, 0, 255);
+            }
+
             ++finished;
-            _process = (static_cast<float>(finished) * i) / static_cast<float>(total);
+            _process = static_cast<float>(finished) / static_cast<float>(total);
         }
     }
 }
