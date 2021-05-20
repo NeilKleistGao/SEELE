@@ -15,19 +15,19 @@ SHADERS_LIST = {
 light = nil
 
 function onCreate()
-    sphere = seele.Sphere(50, {"vertex"}, {"fragment"})
-    sphere:setPosition(seele.vec3(0, 0, 400))
+    sphere = seele.Sphere(100, {"vertex"}, {"fragment"})
+    sphere:setPosition(seele.vec3(0, 0, 0))
     R:addObject(sphere)
 
     camera = seele.Camera(
-            seele.vec3(0, 0, 0),
+            seele.vec3(0, -110, 0),
+            seele.vec3(0, 1, 0),
             seele.vec3(0, 0, 1),
-            seele.vec3(0, -1, 0),
-            90, 1024, 768
+            15, 400, 225
     )
     R:setCamera(camera)
 
-    light = seele.DirectionalLight(seele.normalize(seele.vec3(0, 1, 1)), seele.vec3(255, 255, 255))
+    light = seele.DirectionalLight(seele.normalize(seele.vec3(0, 1, 10)), seele.vec3(255, 255, 255))
 end
 
 function vertex(app_data)

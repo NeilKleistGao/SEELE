@@ -42,7 +42,7 @@ public:
 
     float intersect(const core::raytracing::Ray& ray) const override { return 0.0f; }
 
-    glm::vec3 calculateColor(const core::raytracing::Ray& ray, float t) const override { return {}; }
+    glm::vec3 calculateColor(core::raytracing::RaytracingRenderer* renderer, const core::raytracing::Ray& ray, float t) const override { return {}; }
 private:
     glm::mat4 _v;
     glm::mat4 _p;

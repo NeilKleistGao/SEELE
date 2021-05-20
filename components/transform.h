@@ -21,6 +21,10 @@ namespace core::rasterization {
 class RasterizationRenderer;
 } // namespace core::general
 
+namespace core::raytracing {
+class RaytracingRenderer;
+} // namespace core::raytracing
+
 namespace components {
 class Transform {
 public:
@@ -63,7 +67,7 @@ public:
 
     virtual float intersect(const core::raytracing::Ray& ray) const = 0;
 
-    virtual glm::vec3 calculateColor(const core::raytracing::Ray& ray, float t) const = 0;
+    virtual glm::vec3 calculateColor(core::raytracing::RaytracingRenderer* renderer, const core::raytracing::Ray& ray, float t) const = 0;
 private:
     glm::mat4 _model;
     glm::mat4 _rt_model;

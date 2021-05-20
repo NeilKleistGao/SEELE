@@ -48,7 +48,10 @@ void RaytracingRenderer::render() {
             }
 
             if (hit != nullptr) {
-                _image->putPixel(i, j, 0, 0, 255);
+                auto color = hit->calculateColor(this, ray, min);
+                if (color.x >= 0 && color.y >= 0 && color.z >= 0) {
+                    _image->putPixel(i, j, color.x, color.y, color.z);
+                }
             }
 
             ++finished;

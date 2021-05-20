@@ -8,37 +8,33 @@
  * it applies also to any other work released this way by its authors. You can apply it to your programs, too.
  */
 
-/// @file light.h
+/// @file random.h
 
-#ifndef SEELE_LIGHT_H
-#define SEELE_LIGHT_H
+#ifndef SEELE_RANDOM_H
+#define SEELE_RANDOM_H
 
-#include "transform.h"
+#include <random>
 
-namespace components {
+namespace utilities {
 
-class Light : public Transform {
+class Random {
 public:
-    Light() : Transform() {}
-    ~Light() override = default;
+    Random() : _distribution(0.0f, 1.0f), _generator() {}
+    ~Random() = default;
 
-    struct LightData {
-        glm::vec3 direction;
-        glm::vec3 color;
+    inline float roll() {
+        return _distribution(_generator);
+    }
 
-        LightData() : direction(0, 0, 0), color(0, 0, 0) {}
-    };
-
-    virtual LightData getLightData(const glm::vec3& pos) = 0;
-    void rasterize(core::rasterization::RasterizationRenderer* renderer, int pass) override {}
-
-    float intersect(const core::raytracing::Ray& ray) const override { return 0.0f; }
-
-    glm::vec3 calculateColor(core::raytracing::RaytracingRenderer* renderer, const core::raytracing::Ray& ray, float t) const override { return {}; }
+    inline float roll(float min, float max) {
+        float r = roll();
+        return min + (max - min) * r;
+    }
 private:
-protected:
+    std::uniform_real_distribution<float> _distribution;
+    std::mt19937 _generator;
 };
 
-} // namespace components
+} // namespace utilities
 
-#endif //SEELE_LIGHT_H
+#endif //SEELE_RANDOM_H

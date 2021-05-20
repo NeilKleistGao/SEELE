@@ -171,7 +171,7 @@ float TriMesh::intersect(const core::raytracing::Ray& ray) const {
     return 0.0f;
 }
 
-glm::vec3 TriMesh::calculateColor(const core::raytracing::Ray& ray, float t) const {
+glm::vec3 TriMesh::calculateColor(core::raytracing::RaytracingRenderer* renderer, const core::raytracing::Ray& ray, float t) const {
     // TODO:
     return {};
 }

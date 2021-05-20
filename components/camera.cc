@@ -60,9 +60,9 @@ glm::vec4 Camera::transform(const glm::vec4& vec) const {
 glm::vec3 Camera::getPixelPosition(int x, int y) const {
     auto near = _look_from + _focus * glm::normalize(_look_at);
     auto left = glm::normalize(glm::cross(_vup, _look_at));
-    auto lb = near - (_width / 2) * left - (_height / 2) * _vup;
+    auto lb = near + (_width / 2) * left - (_height / 2) * _vup;
 
-    return lb + static_cast<float>(x) * left + static_cast<float>(y) * _vup;
+    return lb - static_cast<float>(x) * left + static_cast<float>(y) * _vup;
 }
 
 } // namespace components

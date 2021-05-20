@@ -15,6 +15,7 @@
 #include <cmath>
 
 #include "core/rasterization/rasterization_renderer.h"
+#include "core/raytracing/raytracing_renderer.h"
 
 namespace components {
 
@@ -92,9 +93,17 @@ float Sphere::intersect(const core::raytracing::Ray& ray) const {
     return (t1 < 0) ? t2 : t1;
 }
 
-glm::vec3 Sphere::calculateColor(const core::raytracing::Ray& ray, float t) const {
-    // TODO:
-    return {};
+glm::vec3 Sphere::calculateColor(core::raytracing::RaytracingRenderer* renderer, const core::raytracing::Ray& ray, float t) const {
+    auto position = ray.at(t);
+    auto f_shader = renderer->getShader(_fragment_shader[1]);
+
+    ShaderDataList v2f;
+    v2f.emplace_back(); v2f.emplace_back(); v2f.emplace_back();
+    v2f[0].dimension = 3; v2f[0].vec3 = position; v2f[0].interpolation = false;
+    v2f[1].dimension = 2; v2f[1].vec2 = getUV(position); v2f[1].interpolation = false;
+    v2f[2].dimension = 3; v2f[2].vec3 = getNormal(position); v2f[2].interpolation = false;
+
+    return f_shader->onFragment(v2f);
 }
 
 } // namespace components

@@ -29,7 +29,7 @@ public:
     void rasterize(core::rasterization::RasterizationRenderer* renderer, int pass) override;
 
     float intersect(const core::raytracing::Ray& ray) const override;
-    glm::vec3 calculateColor(const core::raytracing::Ray& ray, float t) const override;
+    glm::vec3 calculateColor(core::raytracing::RaytracingRenderer* renderer, const core::raytracing::Ray& ray, float t) const override;
 private:
     using ShaderDataItem = core::general::Shader::ShaderDataItem;
     using ShaderDataList = std::vector<ShaderDataItem>;
