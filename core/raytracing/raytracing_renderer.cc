@@ -15,6 +15,7 @@
 #include <utility>
 
 #include "ray.h"
+#include "utilities/random.h"
 
 namespace core::raytracing {
 
@@ -31,27 +32,43 @@ void RaytracingRenderer::render() {
 
     auto origin = _camera->getOrigin();
     int total = _width * _height, finished = 0;
+    auto random = utilities::Random();
     for (int i = 0; i < _width; ++i) {
         for (int j = 0; j < _height; ++j) {
-            Ray ray(origin, _camera->getPixelPosition(i, j) - origin);
-            float min = -1.0f;
-            const components::Transform* hit = nullptr;
+            auto color = glm::vec3 {0, 0, 0};
+            for (int k = 0; k < MULTIPLE_SAMPLE_TIMES; ++k) {
+                float dx = random.roll(-1, 1),
+                      dy = random.roll(-1, 1);
+                Ray ray(origin, _camera->getPixelPosition(i + dx, j + dy) - origin);
+                float min = -1.0f;
+                const components::Transform* hit = nullptr;
 
-            for (const auto* trans : _transforms) {
-                float res = trans->intersect(ray);
-                if (!std::isnan(res) && res > 0) {
-                    if (min < 0 || res < min) {
-                        min = res;
-                        hit = trans;
+                for (const auto* trans : _transforms) {
+                    float res = trans->intersect(ray);
+                    if (!std::isnan(res) && res > 0) {
+                        if (min < 0 || res < min) {
+                            min = res;
+                            hit = trans;
+                        }
                     }
                 }
+
+                if (hit != nullptr) {
+                    auto temp = hit->calculateColor(this, ray, min);
+                    if (temp.x < 0 || temp.y < 0 || temp.z < 0) {
+                        color.x = -1;
+                        break;
+                    }
+
+                    color += temp;
+                }
+
             }
 
-            if (hit != nullptr) {
-                auto color = hit->calculateColor(this, ray, min);
-                if (color.x >= 0 && color.y >= 0 && color.z >= 0) {
-                    _image->putPixel(i, j, color.x, color.y, color.z);
-                }
+            if (color.x >= 0 && color.y >= 0 && color.z >= 0) {
+                _image->putPixel(i, j, color.x / MULTIPLE_SAMPLE_TIMES,
+                                 color.y / MULTIPLE_SAMPLE_TIMES,
+                                 color.z / MULTIPLE_SAMPLE_TIMES);
             }
 
             ++finished;

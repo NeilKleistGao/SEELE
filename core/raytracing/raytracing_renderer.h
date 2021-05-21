@@ -22,6 +22,7 @@ public:
     RaytracingRenderer(const std::string& script_name, std::string output, int width, int height);
     void render() override;
 private:
+    static constexpr int MULTIPLE_SAMPLE_TIMES = 100;
 protected:
 };
 
