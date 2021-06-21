@@ -33,13 +33,14 @@ void RaytracingRenderer::render() {
     auto origin = _camera->getOrigin();
     int total = _width * _height, finished = 0;
     auto random = utilities::Random();
+
     for (int i = 0; i < _width; ++i) {
         for (int j = 0; j < _height; ++j) {
             auto color = glm::vec3 {0, 0, 0};
             for (int k = 0; k < MULTIPLE_SAMPLE_TIMES; ++k) {
                 float dx = random.roll(-1, 1),
                       dy = random.roll(-1, 1);
-                Ray ray(origin, _camera->getPixelPosition(i + dx, j + dy) - origin);
+                Ray ray(origin, _camera->getPixelPosition((i + dx) / _width, (j + dy) / _height) - origin);
                 float min = -1.0f;
                 const components::Transform* hit = nullptr;
 
@@ -62,11 +63,16 @@ void RaytracingRenderer::render() {
 
                     color += temp;
                 }
+                else {
+                    // temporal global illumination
+                    auto t = 0.5f * (static_cast<float>(_height - j + 1 + dy) / _height + 1.0f);
+                    color += t * glm::vec3(255, 255, 255) + (1.0f - t) * glm::vec3(127, 178, 255);
+                }
 
             }
 
             if (color.x >= 0 && color.y >= 0 && color.z >= 0) {
-                _image->putPixel(i, j, color.x / MULTIPLE_SAMPLE_TIMES,
+                _image->putPixel(i, _height - j - 1, color.x / MULTIPLE_SAMPLE_TIMES,
                                  color.y / MULTIPLE_SAMPLE_TIMES,
                                  color.z / MULTIPLE_SAMPLE_TIMES);
             }

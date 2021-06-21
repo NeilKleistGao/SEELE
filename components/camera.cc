@@ -57,12 +57,12 @@ glm::vec4 Camera::transform(const glm::vec4& vec) const {
     return {temp.x * (_width / 2.0f), temp.y * (_height / 2.0f), temp.z, temp.w};
 }
 
-glm::vec3 Camera::getPixelPosition(int x, int y) const {
+glm::vec3 Camera::getPixelPosition(float x, float y) const {
     auto near = _look_from + _focus * glm::normalize(_look_at);
     auto left = glm::normalize(glm::cross(_vup, _look_at));
-    auto lb = near + (_width / 2) * left - (_height / 2) * _vup;
+    auto lb = near + left * (_width / _height) - _vup;
 
-    return lb - static_cast<float>(x) * left + static_cast<float>(y) * _vup;
+    return lb - x * left * 2.0f * (_width / _height) + y * _vup * 2.0f;
 }
 
 } // namespace components

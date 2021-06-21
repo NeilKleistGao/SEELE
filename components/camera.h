@@ -38,7 +38,7 @@ public:
         return _look_from;
     }
 
-    glm::vec3 getPixelPosition(int x, int y) const;
+    glm::vec3 getPixelPosition(float x, float y) const;
 
     float intersect(const core::raytracing::Ray& ray) const override { return 0.0f; }
 
