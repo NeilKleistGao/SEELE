@@ -8,30 +8,21 @@
  * it applies also to any other work released this way by its authors. You can apply it to your programs, too.
  */
 
-/// @file raytracing_renderer.h
+/// @file hit_record.h
 
-#ifndef SEELE_RAYTRACING_RENDERER_H
-#define SEELE_RAYTRACING_RENDERER_H
+#ifndef SEELE_HIT_RECORD_H
+#define SEELE_HIT_RECORD_H
 
-#include "core/general/renderer.h"
+#include "glm/glm.hpp"
 
 namespace core::raytracing {
 
-class RaytracingRenderer : public general::Renderer {
-public:
-    RaytracingRenderer(const std::string& script_name, std::string output, int width, int height);
-    void render() override;
-private:
-    static constexpr int MULTIPLE_SAMPLE_TIMES = 100;
-    static constexpr int MAX_RECURSE_TIMES = 20;
-
-    glm::vec3 traceColor(int x, int y);
-    glm::vec3 transport(const Ray& ray, int depth);
-
-    static glm::vec3 getRandomDirectionInUnitSphere();
-protected:
+struct HitRecord {
+    glm::vec3 position;
+    glm::vec3 normal;
+    float time;
 };
 
 } // namespace core::raytracing
 
-#endif //SEELE_RAYTRACING_RENDERER_H
+#endif //SEELE_HIT_RECORD_H

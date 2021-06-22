@@ -12,8 +12,6 @@ SHADERS_LIST = {
     "vertex", "fragment", "vertex2", "fragment2"
 }
 
-light = nil
-
 function onCreate()
     sphere = seele.Sphere(0.5, {"vertex"}, {"fragment"})
     sphere:setPosition(seele.vec3(0, 1, 0))
@@ -30,8 +28,6 @@ function onCreate()
             90, 400, 225
     )
     R:setCamera(camera)
-
-    light = seele.DirectionalLight(seele.normalize(seele.vec3(0, 1, 10)), seele.vec3(255, 255, 255))
 end
 
 function vertex(app_data)

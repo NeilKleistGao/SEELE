@@ -16,6 +16,7 @@
 #include "glm/glm.hpp"
 
 #include "core/raytracing/ray.h"
+#include "core/raytracing/hit_record.h"
 
 namespace core::rasterization {
 class RasterizationRenderer;
@@ -65,7 +66,7 @@ public:
 
     virtual void rasterize(core::rasterization::RasterizationRenderer* renderer, int pass) = 0;
 
-    virtual float intersect(const core::raytracing::Ray& ray) const = 0;
+    virtual bool intersect(const core::raytracing::Ray& ray, core::raytracing::HitRecord& record) const = 0;
 
     virtual glm::vec3 calculateColor(core::raytracing::RaytracingRenderer* renderer, const core::raytracing::Ray& ray, float t) const = 0;
 private:

@@ -32,7 +32,7 @@ public:
     virtual LightData getLightData(const glm::vec3& pos) = 0;
     void rasterize(core::rasterization::RasterizationRenderer* renderer, int pass) override {}
 
-    float intersect(const core::raytracing::Ray& ray) const override { return 0.0f; }
+    bool intersect(const core::raytracing::Ray& ray, core::raytracing::HitRecord& record) const override { return false; }
 
     glm::vec3 calculateColor(core::raytracing::RaytracingRenderer* renderer, const core::raytracing::Ray& ray, float t) const override { return {}; }
 private:
