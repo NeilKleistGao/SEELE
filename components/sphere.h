@@ -28,7 +28,7 @@ public:
 
     void rasterize(core::rasterization::RasterizationRenderer* renderer, int pass) override;
 
-    bool intersect(const core::raytracing::Ray& ray, core::raytracing::HitRecord& record) const override;
+    bool intersect(const core::raytracing::Ray& ray, core::raytracing::HitRecord& record, float max) const override;
     glm::vec3 calculateColor(core::raytracing::RaytracingRenderer* renderer, const core::raytracing::Ray& ray, float t) const override;
 private:
     using ShaderDataItem = core::general::Shader::ShaderDataItem;

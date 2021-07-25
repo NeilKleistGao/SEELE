@@ -13,6 +13,7 @@
 #include "image.h"
 
 #include <utility>
+#include <cmath>
 
 #define STB_IMAGE_WRITE_IMPLEMENTATION
 #include "include/stb/stb_image_write.h"
@@ -32,6 +33,26 @@ Image::~Image() {
 
 void Image::flush() {
     stbi_write_png(_filename.c_str(), _width, _height, CHANNEL_SIZE, _buffer, 0);
+}
+
+void Image::putPixel(int x, int y, float r, float g, float b) {
+    int start = (y * _width + x) * CHANNEL_SIZE;
+    r = gamma2(r / 255.0f) * 255.0f; g = gamma2(g / 255.0f) * 255.0f; b = gamma2(b / 255.0f) * 255.0f;
+    _buffer[start] = static_cast<unsigned char>(r);
+    _buffer[start + 1] = static_cast<unsigned char>(g);
+    _buffer[start + 2] = static_cast<unsigned char>(b);
+}
+
+float Image::gamma2(float c) {
+    c = std::sqrt(c);
+    if (c > 1.0f) {
+        c = 1.0f;
+    }
+    if (c < 0.0f) {
+        c = 0.0f;
+    }
+
+    return c;
 }
 
 } // namespace core::general

@@ -166,7 +166,7 @@ TriMesh::ShaderDataList TriMesh::interpolate(
     return res;
 }
 
-bool TriMesh::intersect(const core::raytracing::Ray& ray, core::raytracing::HitRecord& record) const {
+bool TriMesh::intersect(const core::raytracing::Ray& ray, core::raytracing::HitRecord& record, float max) const {
     // TODO:
     return false;
 }

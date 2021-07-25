@@ -71,7 +71,7 @@ glm::vec2 Sphere::getUV(const glm::vec3& pos) const {
     return glm::vec2(1 - (phi + PI) / (2 * PI), (theta + PI / 2) / PI);
 }
 
-bool Sphere::intersect(const core::raytracing::Ray& ray, core::raytracing::HitRecord& record) const {
+bool Sphere::intersect(const core::raytracing::Ray& ray, core::raytracing::HitRecord& record, float max) const {
     auto sub = ray.getOrigin() - _position;
 
     float a = glm::dot(ray.getDirection(), ray.getDirection()),
@@ -79,18 +79,19 @@ bool Sphere::intersect(const core::raytracing::Ray& ray, core::raytracing::HitRe
           c = glm::dot(sub, sub) - _radius * _radius;
 
     float delta = b * b - a * c;
-    if (delta < 1e-6) {
+    if (delta < 0) {
         return false;
     }
 
-    record.time = (-b - std::sqrt(delta)) / a;
-    if (record.time <= 1e-4) {
-        record.time = (-b + std::sqrt(delta)) / a;
-        if (record.time <= 1e-4) {
+    float root = (-b - std::sqrt(delta)) / a;
+    if (root <= 0 || max < root) {
+        root = (-b + std::sqrt(delta)) / a;
+        if (root <= 0 || max < root) {
             return false;
         }
     }
 
+    record.time = root;
     record.position = ray.at(record.time);
     record.normal = (record.position - _position) / _radius;
     return true;

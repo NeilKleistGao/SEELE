@@ -23,7 +23,7 @@ public:
     void render() override;
 private:
     static constexpr int MULTIPLE_SAMPLE_TIMES = 100;
-    static constexpr int MAX_RECURSE_TIMES = 20;
+    static constexpr int MAX_RECURSE_TIMES = 50;
 
     glm::vec3 traceColor(int x, int y);
     glm::vec3 transport(const Ray& ray, int depth);

@@ -23,10 +23,7 @@ public:
 
     void flush();
 
-    inline void putPixel(int x, int y, unsigned char r, unsigned char g, unsigned char b) {
-        int start = (y * _width + x) * CHANNEL_SIZE;
-        _buffer[start] = r; _buffer[start + 1] = g; _buffer[start + 2] = b;
-    }
+    void putPixel(int x, int y, float r, float g, float b);
 private:
     unsigned char* _buffer;
     int _width;
@@ -34,6 +31,8 @@ private:
     std::string _filename;
 
     static constexpr int CHANNEL_SIZE = 3;
+
+    static float gamma2(float c);
 protected:
 };
 }

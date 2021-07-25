@@ -66,7 +66,7 @@ public:
 
     virtual void rasterize(core::rasterization::RasterizationRenderer* renderer, int pass) = 0;
 
-    virtual bool intersect(const core::raytracing::Ray& ray, core::raytracing::HitRecord& record) const = 0;
+    virtual bool intersect(const core::raytracing::Ray& ray, core::raytracing::HitRecord& record, float max) const = 0;
 
     virtual glm::vec3 calculateColor(core::raytracing::RaytracingRenderer* renderer, const core::raytracing::Ray& ray, float t) const = 0;
 private:

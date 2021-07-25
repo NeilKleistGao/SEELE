@@ -51,14 +51,10 @@ glm::vec3 RaytracingRenderer::traceColor(int x, int y) {
     auto random = utilities::Random();
     auto color = glm::vec3 {0, 0, 0};
 
-    if (x == 200 && y == 170) {
-        int a = 0;
-    }
-
     for (int i = 0; i < MULTIPLE_SAMPLE_TIMES; ++i) {
         float dx = random.roll(-1, 1),
                 dy = random.roll(-1, 1);
-        Ray ray(origin, _camera->getPixelPosition((x + dx) / _width, (y + dy) / _height) - origin);
+        Ray ray(origin, _camera->getPixelPosition((x + dx) / (_width - 1), (y + dy) / (_height - 1)) - origin);
         auto temp = transport(ray, MAX_RECURSE_TIMES);
         if (temp.x >= 0 && temp.y >= 0 && temp.z >= 0) {
             color += temp;
@@ -73,33 +69,30 @@ glm::vec3 RaytracingRenderer::transport(const Ray& ray, int depth) {
         return glm::vec3 {0, 0, 0};
     }
 
-    float min = -1.0f;
     const components::Transform* hit = nullptr;
-    HitRecord record{}, temp{};
+    HitRecord record{};
+    record.time = std::numeric_limits<float>::infinity();
 
     for (const auto* trans : _transforms) {
-        if (trans->intersect(ray, temp)) {
-            if (min < 0 || temp.time < min) {
-                min = temp.time;
-                hit = trans;
-                record = temp;
-            }
+        if (trans->intersect(ray, record, record.time)) {
+            hit = trans;
         }
     }
 
     if (hit != nullptr) {
         Ray another{record.position, record.normal + getRandomDirectionInUnitSphere()};
+//        Ray another{record.position, record.normal};
         return 0.5f * transport(another, depth - 1);
     }
     else {
         // temporal global illumination
-        auto t = 0.5f * (1.0f + ray.getDirection().z);
+        auto t = 0.5f * (1.0f + ray.getDirection().y);
         return (1.0f - t) * glm::vec3(255, 255, 255) + t * glm::vec3(127, 178, 255);
     }
 }
 
 glm::vec3 RaytracingRenderer::getRandomDirectionInUnitSphere() {
-    auto random = utilities::Random();
+    static auto random = utilities::Random();
     while (true) {
         auto dir = glm::vec3 {random.roll(-1, 1), random.roll(-1, 1), random.roll(-1, 1)};
         if (glm::dot(dir, dir) >= 1) {

@@ -14,17 +14,17 @@ SHADERS_LIST = {
 
 function onCreate()
     sphere = seele.Sphere(0.5, {"vertex"}, {"fragment"})
-    sphere:setPosition(seele.vec3(0, 1, 0))
+    sphere:setPosition(seele.vec3(0, 0, -1))
     R:addObject(sphere)
 
     terrain = seele.Sphere(100, {"vertex2"}, {"fragment2"})
-    terrain:setPosition(seele.vec3(0, 1, -100.5))
+    terrain:setPosition(seele.vec3(0, -100.5, -1))
     R:addObject(terrain)
 
     camera = seele.Camera(
             seele.vec3(0, 0, 0),
+            seele.vec3(0, 0, -1),
             seele.vec3(0, 1, 0),
-            seele.vec3(0, 0, 1),
             90, 400, 225
     )
     R:setCamera(camera)
