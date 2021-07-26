@@ -8,35 +8,18 @@
  * it applies also to any other work released this way by its authors. You can apply it to your programs, too.
  */
 
-/// @file light.h
+/// @file hittable.h
 
-#ifndef SEELE_LIGHT_H
-#define SEELE_LIGHT_H
-
-#include "transform.h"
+#ifndef SEELE_HITTABLE_H
+#define SEELE_HITTABLE_H
 
 namespace components {
 
-class Light : public Transform {
+class Hittable {
 public:
-    Light() : Transform() {}
-    ~Light() override = default;
-
-    struct LightData {
-        glm::vec3 direction;
-        glm::vec3 color;
-
-        LightData() : direction(0, 0, 0), color(0, 0, 0) {}
-    };
-
-    virtual LightData getLightData(const glm::vec3& pos) = 0;
-    void rasterize(core::rasterization::RasterizationRenderer* renderer, int pass) override {}
-
-    glm::vec3 calculateColor(core::raytracing::RaytracingRenderer* renderer, const core::raytracing::Ray& ray, float t) const override { return {}; }
-private:
-protected:
+    virtual bool intersect(const core::raytracing::Ray& ray, core::raytracing::HitRecord& record, float max) const = 0;
 };
 
 } // namespace components
 
-#endif //SEELE_LIGHT_H
+#endif //SEELE_HITTABLE_H

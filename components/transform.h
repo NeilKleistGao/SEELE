@@ -17,6 +17,7 @@
 
 #include "core/raytracing/ray.h"
 #include "core/raytracing/hit_record.h"
+#include "hittable.h"
 
 namespace core::rasterization {
 class RasterizationRenderer;
@@ -27,7 +28,7 @@ class RaytracingRenderer;
 } // namespace core::raytracing
 
 namespace components {
-class Transform {
+class Transform : public Hittable {
 public:
     Transform();
     virtual ~Transform() = default;
@@ -66,9 +67,12 @@ public:
 
     virtual void rasterize(core::rasterization::RasterizationRenderer* renderer, int pass) = 0;
 
-    virtual bool intersect(const core::raytracing::Ray& ray, core::raytracing::HitRecord& record, float max) const = 0;
+    bool intersect(const core::raytracing::Ray& ray, core::raytracing::HitRecord& record, float max) const override {}
 
     virtual glm::vec3 calculateColor(core::raytracing::RaytracingRenderer* renderer, const core::raytracing::Ray& ray, float t) const = 0;
+
+    bool scatter(const core::raytracing::Ray& ray, const core::raytracing::HitRecord& record,
+                 glm::vec3& color, core::raytracing::Ray& scattered) const;
 private:
     glm::mat4 _model;
     glm::mat4 _rt_model;

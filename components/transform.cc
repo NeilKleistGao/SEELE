@@ -35,4 +35,9 @@ void Transform::updateModelMatrix() {
     _rt_model = glm::transpose(_rt_model);
 }
 
+bool Transform::scatter(const core::raytracing::Ray& ray, const core::raytracing::HitRecord& record,
+                 glm::vec3& color, core::raytracing::Ray& scattered) const {
+
+}
+
 } // namespace components

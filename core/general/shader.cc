@@ -114,4 +114,9 @@ Shader::ShaderDataItem::ShaderDataItem(const ShaderDataItem& other)
     }
 }
 
+bool Shader::scatter(const core::raytracing::Ray& ray, const core::raytracing::HitRecord& record,
+             glm::vec3& color, core::raytracing::Ray& scattered) {
+    // TODO:
+}
+
 } // namespace core::general

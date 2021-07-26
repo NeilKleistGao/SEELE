@@ -80,9 +80,13 @@ glm::vec3 RaytracingRenderer::transport(const Ray& ray, int depth) {
     }
 
     if (hit != nullptr) {
-        Ray another{record.position, record.normal + getRandomDirectionInUnitSphere()};
-//        Ray another{record.position, record.normal};
-        return 0.5f * transport(another, depth - 1);
+        Ray another{record.position, record.normal};
+        glm::vec3 attenuation;
+        if (hit->scatter(ray, record, attenuation, another)) {
+            return attenuation * transport(another, depth - 1);
+        }
+
+        return glm::vec3{0, 0, 0};
     }
     else {
         // temporal global illumination

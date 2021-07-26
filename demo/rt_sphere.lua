@@ -9,7 +9,7 @@
 --- rt_sphere.lua
 
 SHADERS_LIST = {
-    "vertex", "fragment", "vertex2", "fragment2"
+    "lambertian"
 }
 
 function onCreate()
@@ -30,18 +30,6 @@ function onCreate()
     R:setCamera(camera)
 end
 
-function vertex(app_data)
-    return {}
-end
-
-function fragment(v2f)
-    return seele.vec3(255, 0, 0)
-end
-
-function vertex2(app_data)
-    return {}
-end
-
-function fragment2(v2f)
-    return seele.vec3(0, 255, 0)
+function lambertian(ray)
+    -- TODO:
 end

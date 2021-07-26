@@ -19,6 +19,8 @@
 #include "LuaBridge/LuaBridge.h"
 
 #include "glm/glm.hpp"
+#include "core/raytracing/ray.h"
+#include "core/raytracing/hit_record.h"
 
 namespace core::general {
 
@@ -43,6 +45,9 @@ public:
 
     std::vector<ShaderDataItem> onVertex(const std::vector<ShaderDataItem>& appdata);
     glm::vec3 onFragment(const std::vector<ShaderDataItem>& v2f);
+
+    bool scatter(const core::raytracing::Ray& ray, const core::raytracing::HitRecord& record,
+                 glm::vec3& color, core::raytracing::Ray& scattered);
 private:
     lua_State* _state;
     luabridge::LuaRef _function;

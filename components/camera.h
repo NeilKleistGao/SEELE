@@ -40,8 +40,6 @@ public:
 
     glm::vec3 getPixelPosition(float x, float y) const;
 
-    bool intersect(const core::raytracing::Ray& ray, core::raytracing::HitRecord& record, float max) const override { return false; }
-
     glm::vec3 calculateColor(core::raytracing::RaytracingRenderer* renderer, const core::raytracing::Ray& ray, float t) const override { return {}; }
 private:
     glm::mat4 _v;
