@@ -109,4 +109,11 @@ glm::vec3 Sphere::calculateColor(core::raytracing::RaytracingRenderer* renderer,
 
     return f_shader->onFragment(v2f);
 }
+
+
+bool Sphere::scatter(core::raytracing::RaytracingRenderer* renderer, const core::raytracing::Ray& ray, const core::raytracing::HitRecord& record,
+                    glm::vec3& color, core::raytracing::Ray& scattered) const {
+    auto scatter_function = renderer->getShader(_fragment_shader[1]);
+    return scatter_function->scatter(ray, record, color, scattered);
+}
 } // namespace components

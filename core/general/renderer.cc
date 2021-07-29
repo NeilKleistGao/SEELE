@@ -21,6 +21,7 @@
 #include "components/directional_light.h"
 #include "../rasterization/rasterization_renderer.h"
 #include "components/sphere.h"
+#include "../raytracing/ray.h"
 
 namespace core::general {
 
@@ -129,6 +130,16 @@ void Renderer::registerComponents() {
         .endClass()
 
         .addFunction<glm::vec3, const glm::vec3&>("normalize", &glm::normalize)
+
+        .beginClass<raytracing::HitRecord>("HitRecord")
+            .addProperty("position", &raytracing::HitRecord::position)
+            .addProperty("normal", &raytracing::HitRecord::normal)
+            .addProperty("time", &raytracing::HitRecord::time)
+        .endClass()
+
+        .beginClass<raytracing::Ray>("Ray")
+            .addConstructor<void (*) (const glm::vec3&, const glm::vec3&)>()
+        .endClass()
     .endNamespace();
 }
 

@@ -82,7 +82,7 @@ glm::vec3 RaytracingRenderer::transport(const Ray& ray, int depth) {
     if (hit != nullptr) {
         Ray another{record.position, record.normal};
         glm::vec3 attenuation;
-        if (hit->scatter(ray, record, attenuation, another)) {
+        if (hit->scatter(this, ray, record, attenuation, another)) {
             return attenuation * transport(another, depth - 1);
         }
 
@@ -92,18 +92,6 @@ glm::vec3 RaytracingRenderer::transport(const Ray& ray, int depth) {
         // temporal global illumination
         auto t = 0.5f * (1.0f + ray.getDirection().y);
         return (1.0f - t) * glm::vec3(255, 255, 255) + t * glm::vec3(127, 178, 255);
-    }
-}
-
-glm::vec3 RaytracingRenderer::getRandomDirectionInUnitSphere() {
-    static auto random = utilities::Random();
-    while (true) {
-        auto dir = glm::vec3 {random.roll(-1, 1), random.roll(-1, 1), random.roll(-1, 1)};
-        if (glm::dot(dir, dir) >= 1) {
-            continue;
-        }
-
-        return dir;
     }
 }
 

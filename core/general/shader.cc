@@ -116,7 +116,14 @@ Shader::ShaderDataItem::ShaderDataItem(const ShaderDataItem& other)
 
 bool Shader::scatter(const core::raytracing::Ray& ray, const core::raytracing::HitRecord& record,
              glm::vec3& color, core::raytracing::Ray& scattered) {
-    // TODO:
+    auto res_table = _function(ray, record);
+    auto bool_res = res_table[1];
+    auto color_res = res_table[2];
+    auto scattered_res = res_table[3];
+
+    color = luabridge::LuaRef_cast<glm::vec3>(color_res);
+    scattered = luabridge::LuaRef_cast<core::raytracing::Ray>(scattered_res);
+    return luabridge::LuaRef_cast<bool>(bool_res);
 }
 
 } // namespace core::general

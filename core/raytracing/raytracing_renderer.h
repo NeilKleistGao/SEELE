@@ -27,8 +27,6 @@ private:
 
     glm::vec3 traceColor(int x, int y);
     glm::vec3 transport(const Ray& ray, int depth);
-
-    static glm::vec3 getRandomDirectionInUnitSphere();
 protected:
 };
 

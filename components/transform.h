@@ -71,8 +71,8 @@ public:
 
     virtual glm::vec3 calculateColor(core::raytracing::RaytracingRenderer* renderer, const core::raytracing::Ray& ray, float t) const = 0;
 
-    bool scatter(const core::raytracing::Ray& ray, const core::raytracing::HitRecord& record,
-                 glm::vec3& color, core::raytracing::Ray& scattered) const;
+    virtual bool scatter(core::raytracing::RaytracingRenderer* renderer, const core::raytracing::Ray& ray, const core::raytracing::HitRecord& record,
+                 glm::vec3& color, core::raytracing::Ray& scattered) const {}
 private:
     glm::mat4 _model;
     glm::mat4 _rt_model;
