@@ -51,11 +51,6 @@ end
 
 function metal(ray, record, albedo)
     local in_direction = ray:getDirection()
-    local random_direction = getRandomDirectionInUnitSphere()
-    in_direction.x = in_direction.x + random_direction.x
-    in_direction.y = in_direction.y + random_direction.y
-    in_direction.z = in_direction.z + random_direction.z
-
     local scatter_direction = reflect(in_direction, record.normal)
     local scatter_ray = seele.Ray(record.position, scatter_direction)
 
