@@ -26,6 +26,7 @@ Camera::Camera(const glm::vec3& look_from, const glm::vec3& look_at, const glm::
     _focus = 1 / std::tan(theta / 2);
 
     _v = glm::mat4 {1.0f};
+    _v = glm::translate(_v, -look_from);
 
     auto x = glm::normalize(glm::cross(look_at, vup));
     auto temp = glm::mat4 {1.0f};

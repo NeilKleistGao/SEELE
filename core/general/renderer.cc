@@ -21,7 +21,7 @@
 #include "components/directional_light.h"
 #include "../rasterization/rasterization_renderer.h"
 #include "components/sphere.h"
-#include "../raytracing/ray.h"
+#include "utilities/random.h"
 
 namespace core::general {
 
@@ -139,6 +139,12 @@ void Renderer::registerComponents() {
 
         .beginClass<raytracing::Ray>("Ray")
             .addConstructor<void (*) (const glm::vec3&, const glm::vec3&)>()
+            .addFunction("getDirection", &raytracing::Ray::getDirection)
+        .endClass()
+
+        .beginClass<utilities::Random>("Random")
+            .addConstructor<void (*) (void)>()
+            .addFunction<float, float>("roll", &utilities::Random::roll)
         .endClass()
     .endNamespace();
 }

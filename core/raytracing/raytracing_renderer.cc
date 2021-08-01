@@ -83,7 +83,7 @@ glm::vec3 RaytracingRenderer::transport(const Ray& ray, int depth) {
         Ray another{record.position, record.normal};
         glm::vec3 attenuation;
         if (hit->scatter(this, ray, record, attenuation, another)) {
-            return attenuation * transport(another, depth - 1);
+            return (1.0f / 255.0f) * attenuation * transport(another, depth - 1);
         }
 
         return glm::vec3{0, 0, 0};
