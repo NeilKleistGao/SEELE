@@ -21,6 +21,7 @@ struct HitRecord {
     glm::vec3 position;
     glm::vec3 normal;
     float time;
+    bool front;
 };
 
 } // namespace core::raytracing

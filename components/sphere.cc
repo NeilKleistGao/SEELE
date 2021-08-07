@@ -94,6 +94,11 @@ bool Sphere::intersect(const core::raytracing::Ray& ray, core::raytracing::HitRe
     record.time = root;
     record.position = ray.at(record.time);
     record.normal = (record.position - _position) / _radius;
+    record.front = (glm::dot(ray.getDirection(), record.normal) < 0);
+    if (!record.front) {
+        record.normal = -record.normal;
+    }
+
     return true;
 }
 

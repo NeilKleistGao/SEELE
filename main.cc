@@ -44,16 +44,17 @@ static const std::string LUA_TEMPLATE = "SHADERS_LIST = {\n"
 void wait() {
     while (!finished.load()) {
         auto process = render->getProcess() * 100;
-        printf("\rRendering[%.2f%%]: ", process);
+        printf("Rendering[%.2f%%]: ", process);
 
         for (int i = 1; i <= process; i += 5) {
             printf("█");
         }
-        putchar('\n');
+        std::cout.flush();
 
         using namespace std::chrono_literals;
-        std::this_thread::sleep_for(300ms);
+        std::this_thread::sleep_for(1000ms);
         std::this_thread::yield();
+        putchar('\r');
     }
 }
 

@@ -135,6 +135,7 @@ void Renderer::registerComponents() {
             .addProperty("position", &raytracing::HitRecord::position)
             .addProperty("normal", &raytracing::HitRecord::normal)
             .addProperty("time", &raytracing::HitRecord::time)
+            .addProperty("front", &raytracing::HitRecord::front)
         .endClass()
 
         .beginClass<raytracing::Ray>("Ray")
